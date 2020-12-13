@@ -18,7 +18,7 @@ double Distance(Point a, Point b)
  */
 void ArmorPlate::run()
 {
-    VideoCapture cap(0);
+    VideoCapture cap("/home/xx/下载/视频/效果图/armor_1.avi");
     //检查是否成功打开
     ImageProcess img;
     LightBar rgb;
@@ -29,7 +29,6 @@ void ArmorPlate::run()
 
     for (;;)
     {
-
         double t = (double)cv::getTickCount(); //开始计时
         this->success_armor = false;
         Mat frame;
@@ -51,7 +50,7 @@ void ArmorPlate::run()
             //装甲板大于等于1块时
             if (rgb.armor_fitting(img.gray_img))
             {
-                this->rect_num = rgb.optimal_armor(this->lost_success_armor);
+                this->rect_num = rgb.optimal_armor();
 #if DRAW_ARMOR_IMG == 1
                 rectangle(this->draw_img, rgb.armor[this->rect_num].boundingRect(), Scalar(0, 255, 0), 3, 8);
                 rectangle(this->draw_img, rgb.roi_rect.boundingRect(), Scalar(255, 200, 0), 3, 8);
@@ -87,7 +86,7 @@ void ArmorPlate::run()
         int fps = int(1.0 / t);                                        //转换为帧率
         cout << "FPS: " << fps << endl;                                //输出帧率
 
-        char c = waitKey(1);
+        char c = waitKey(300);
         if (c == 27) //"Esc"-退出
         {
             break;
@@ -273,6 +272,9 @@ bool LightBar::armor_fitting(Mat src_img)
                     if (this->average_color(this->armor_rect(light_left, light_right, src_img, error_angle)) < 50)
                     {
                         success_armor++;
+                        //储存灯条左右下标
+                        this->light_subscript.push_back(light_left);
+                        this->light_subscript.push_back(light_right);
                     }
                 }
             }
@@ -354,55 +356,67 @@ Mat LightBar::armor_rect(int i, int j, Mat src_img, float angle)
 }
 
 /**
- * @brief 多个装甲板筛选
+ * @brief 多个装甲板筛选优先级
  * 
  * @return Point 返回离图像中心点最近的装甲板中心点
  */
-int LightBar::optimal_armor(bool judge)
+int LightBar::optimal_armor()
 {
-    //图像中心点
-    Point img_center(this->img_cols / 2, this->img_rows / 2);
-    //筛选装甲板离中心点最小的位置
-    int dist_min = 10000, num = 0;
-    for (size_t i = 0; i < this->armor.size(); i++)
+    int max = -1;
+    for (size_t i = 0; i < this->armor.size(); i += 2)
     {
-        int dist = Distance(this->armor[i].center, img_center);
-        if (dist < dist_min)
+        //灯条是“\\”或者“//”和“||”这样
+        if (fabs(this->light[this->light_subscript[i]].angle - this->light[this->light_subscript[i + 1]].angle) < 5)
         {
-            dist_min = dist;
-            num = i;
+            this->priority.push_back(true);
         }
-    }
 
-#if ROI_IMG == 1
-    if (judge) //图像ROI
-    {
-        int _x = roi_rect.boundingRect().x + this->armor[num].center.x;
-        int _y = roi_rect.boundingRect().y + this->armor[num].center.y;
-        RotatedRect _rect = RotatedRect(
-            Point(_x, _y),
-            Size(this->armor[num].size.width, this->armor[num].size.height),
-            this->armor[num].angle);
-        this->armor[num] = _rect; //储存更新完后装甲板位置
-        // cout << "armor = " << _rect.center << _rect.size << endl;
-        //更新下一帧ROI位置
-        this->roi_rect = RotatedRect(
-            this->armor[num].center,
-            Size(this->armor[num].size.width * 8, this->armor[num].size.height * 8),
-            this->armor[num].angle);
-        // cout << "roi = " << roi_rect.center << roi_rect.size << endl;
-        // cout << endl;
+        //灯条的高度差不超过最大灯条高度的四分之一
+        int left_h = MAX(this->light[this->light_subscript[i]].size.width, this->light[this->light_subscript[i]].size.height);
+        int right_h = MAX(this->light[this->light_subscript[i + 1]].size.width, this->light[this->light_subscript[i + 1]].size.height);
+        int _h = MAX(left_h, right_h) / 4;
+        if (fabs(this->light[this->light_subscript[i]].center.y - this->light[this->light_subscript[i + 1]].center.y) < _h)
+        {
+            this->priority.push_back(true);
+        }
+
+        //灯条高度差距不超过10%
+        if (left_h > _h * 3.6 || right_h > _h * 3.6)
+        {
+            this->priority.push_back(true);
+        }
+
+        //灯条中心点形成的直线与水平线的夹角
+        float delta_y = this->light[this->light_subscript[i]].center.y - this->light[this->light_subscript[i + 1]].center.y;
+        float delta_x = this->light[this->light_subscript[i]].center.x - this->light[this->light_subscript[i + 1]].center.x;
+        float deviationAngle = abs(atan(delta_y / delta_x)) * 180 / CV_PI;
+        if (deviationAngle < 50)
+        {
+            this->priority.push_back(true);
+        }
+
+        //灯条的中心店到装甲板中心点的距离超过最小灯条的宽度
+        int h_ = MIN(left_h, right_h);
+        if (Distance(this->armor[i / 2].center, this->light[this->light_subscript[i]].center) > h_ && Distance(this->armor[i / 2].center, this->light[this->light_subscript[i + 1]].center) > h_)
+        {
+            this->priority.push_back(true);
+        }
+
+        if (this->priority.size() > max)
+        {
+            max = this->priority.size();
+            this->armor_subscript = i / 2;
+        }
+        else if (this->priority.size() == max)
+        {
+            int armor_h = MAX(this->armor[this->armor_subscript].size.width, this->armor[this->armor_subscript].size.height);
+            if (armor_h > _h * 2)
+            {
+                this->armor_subscript = i / 2;
+            }
+        }
+        this->priority.clear();
     }
-    else
-    {
-        RotatedRect _rect = RotatedRect(
-            this->armor[num].center,
-            Size(IMG_COLS / 4, IMG_ROWS / 4),
-            this->armor[num].angle);
-        this->roi_rect = _rect; //储存下一帧ROI位置
-    }
-#endif
-    return num;
 }
 
 /**
@@ -413,6 +427,7 @@ void LightBar::eliminate()
 {
     light.clear();
     armor.clear();
+    light_subscript.clear();
 }
 
 /**

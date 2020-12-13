@@ -35,14 +35,17 @@ public:
     vector<RotatedRect> light;       //储存灯条的旋转矩形
     vector<RotatedRect> armor;       //储存装甲板的旋转矩形
     RotatedRect roi_rect;            //下次图像ROI位置
+    vector<int> light_subscript;     //灯条下标
+    vector<bool> priority;           //优先级
     float light_aspect_ratio = 0.6f; //灯条长宽比
     float light_angle = 45.0;        //灯条角度
+    int armor_subscript;             //击打装甲板下标保存
     bool armor_fitting(Mat src_img);
     bool light_judge(int i, int j);
     bool find_light(Mat mask);
     int average_color(Mat roi);
     void eliminate();
-    int optimal_armor(bool judge);
+    int optimal_armor();
     int light_is_one();
     int img_cols;
     int img_rows;
@@ -69,6 +72,6 @@ public:
     int blue_armor_gray_th = 80;
     int blue_armor_color_th = 135;
     //红色th参数
-    int red_armor_gray_th = 225; //视频20
+    int red_armor_gray_th = 20; //视频20
     int red_armor_color_th = 50;
 };
