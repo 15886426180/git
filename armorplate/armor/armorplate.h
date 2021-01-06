@@ -39,7 +39,6 @@ public:
     vector<bool> priority;           //优先级
     float light_aspect_ratio = 0.6f; //灯条长宽比
     float light_angle = 45.0;        //灯条角度
-    int armor_subscript;             //击打装甲板下标保存
     bool armor_fitting(Mat src_img);
     bool light_judge(int i, int j);
     bool find_light(Mat mask);
@@ -73,5 +72,5 @@ public:
     int blue_armor_color_th = 135;
     //红色th参数
     int red_armor_gray_th = 20; //视频20
-    int red_armor_color_th = 50;
+    int red_armor_color_th = 34;
 };

@@ -9,7 +9,7 @@
  * @brief 打开ROI截取
  * @param 1 截取
  * @param 0 不截取 
- * 有问题
+ * 有问题还没改好
  */
 #define FPS_SHOW 1
 /**
@@ -62,4 +62,37 @@
 /**
  * @brief 图像高度 480
  * 
+ */
+
+#define Small_ARMORPLATE_WIDTH 125
+/**
+ * @brief 小装甲板实际宽度(mm)
+ * 
+ */
+#define ARMORPLATE_HIGHT 55
+/**
+ * @brief 装甲板实际高度(mm)
+ * 
+ */
+#define BIG_ARMORPLATE_WIDITH 255
+/**
+ * @brief 大装机板实际宽度(mm)
+ * 
+ */
+
+#define FOLCAL_LENGTH_X 485.33929
+/**
+ * @brief X轴焦距
+ * 
+ */
+#define FOLCAL_LENGTH_Y 485.30742
+/**
+ * @brief Y轴焦距
+ * 
+ */
+#define CALL_PNP 1
+/**
+ * @brief 是否调用测距
+ * @param 0     否
+ * @param 1     是
  */
