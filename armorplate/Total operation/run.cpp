@@ -87,7 +87,7 @@ void WorKing::Run()
     }
 }
 
-WorKing::~WorKing(){}
+WorKing::~WorKing() {}
 
 void WorKing::ddd()
 {
@@ -98,14 +98,11 @@ void WorKing::ddd()
             frame = cvarrToMat(cap.iplImage, true);
         }
         imshow("frame", frame);
+        cap.cameraReleasebuff();
         char c = waitKey(1);
         if (c == 27) //"Esc"-退出
         {
             break;
-        }
-        else if (c == 'q')
-        {
-            
         }
     }
 }

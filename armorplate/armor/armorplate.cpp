@@ -282,7 +282,7 @@ int LightBar::optimal_armor()
 {
     size_t max = 0;
     int max_num = 0;
-    for (size_t i = 0; i < this->armor.size(); i += 2)
+    for (size_t i = 0; i < this->light_subscript.size(); i += 2)
     {
         //灯条是“\\”或者“//”和“||”这样
         if (fabs(this->light[this->light_subscript[i]].angle - this->light[this->light_subscript[i + 1]].angle) < 5)

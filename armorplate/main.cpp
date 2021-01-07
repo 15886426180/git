@@ -5,5 +5,6 @@
 int main()
 {
     WorKing run;
-    run.Run();
+    // run.Run();
+    run.ddd();
 }
