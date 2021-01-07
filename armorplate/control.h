@@ -1,9 +1,11 @@
+#ifndef CONTROL_H
+#define CONTROL_H
+
 #define MAXIMUM_LOSS 2
 /**
  * @brief 最大丢失次数
  * 
  */
-
 #define ROI_IMG 0
 /**
  * @brief 打开ROI截取
@@ -96,3 +98,36 @@
  * @param 0     否
  * @param 1     是
  */
+
+#define LIGHT_WIDITH 10
+/**
+ * @brief 灯条实际宽度(mm)
+ * 
+ */
+#define CAMERA_EXPOSURETIME 800
+#define CAMERA_RESOLUTION_COLS 1280
+#define CAMERA_RESOLUTION_ROWS 800
+#define CAMERA_RESOLUTION_COLS_FOV ((1280-CAMERA_RESOLUTION_COLS)*0.5)
+#define CAMERA_RESOLUTION_ROWS_FOV ((1024-CAMERA_RESOLUTION_ROWS)*0.5)
+/**
+  @brief: 设置相机的分辨率
+  @param: CAMERA_EXPOSURETIME   相机曝光时间
+  @param: COLS                  为图像的宽度
+  @param: ROWS                  为图像的高度
+  @param: FOV                   为图像对应左上角的偏移值
+  @note: 这部分相机文档中是写反的　x轴　和　y轴
+         偏移值计算为 *** (相机最大分辨率 - 当前设置分辨率)/2 ***
+*/
+/*---------------------------------------------------*/
+#define CAMERA_PARAM_FILE "/home/xx/github/armorplate/cameraParams.xml"
+/**
+ * @brief 相机标定文件位置
+ * 
+ */
+#define PI 3.1415926
+/**
+ * @brief π
+ * 
+ */
+
+#endif

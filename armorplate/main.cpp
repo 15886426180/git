@@ -1,5 +1,4 @@
 #include <armor/armorplate.h>
-#include <pnp/solvepnp.h>
 
 int main()
 {

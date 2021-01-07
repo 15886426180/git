@@ -1,5 +1,4 @@
 #include "armorplate.h"
-#include "solvepnp.h"
 
 /**
  * @brief 求两点之间的距离
@@ -8,7 +7,7 @@
  * @param b 点B
  * @return double 两点之间的距离 
  */
-float Distance(Point a, Point b)
+double Distance(Point a, Point b)
 {
     return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 }
@@ -19,12 +18,10 @@ float Distance(Point a, Point b)
  */
 void ArmorPlate::run()
 {
-    VideoCapture cap("/home/xx/下载/视频/效果图/armor_3.avi");
-    // VideoCapture cap(0);
+    VideoCapture cap(0);
     //检查是否成功打开
     ImageProcess img;
     LightBar rgb;
-    SolveP4p p4p;
     if (!cap.isOpened())
     {
         cout << "打开失败" << endl;
@@ -32,10 +29,7 @@ void ArmorPlate::run()
 
     for (;;)
     {
-#if FPS_SHOW == 1
         double t = (double)cv::getTickCount(); //开始计时
-#endif
-
         this->success_armor = false;
         Mat frame;
         cap.read(frame);
@@ -64,9 +58,6 @@ void ArmorPlate::run()
                 rectangle(src_img, rgb.roi_rect.boundingRect(), Scalar(255, 200, 0), 3, 8);
 #endif
                 this->success_armor = true;
-#if CALL_PNP == 1
-                p4p.Rotate_Point(rgb.armor[this->rect_num], rgb.light[rgb.light_subscript[this->rect_num * 2]], rgb.light[rgb.light_subscript[this->rect_num * 2 + 1]]);
-#endif
             }
             else //丢失目标
             {
@@ -90,13 +81,12 @@ void ArmorPlate::run()
 
         imshow("frame", src_img);
         imshow("draw", this->draw_img);
-#if FPS_SHOW == 1
+
         t = ((double)cv::getTickCount() - t) / cv::getTickFrequency(); //结束计时
         int fps = int(1.0 / t);                                        //转换为帧率
         cout << "FPS: " << fps << endl;                                //输出帧率
-#endif
 
-        char c = waitKey(300);
+        char c = waitKey(1);
         if (c == 27) //"Esc"-退出
         {
             break;
@@ -307,7 +297,7 @@ bool LightBar::light_judge(int i, int j)
     int right_h = MAX(light[j].size.height, light[j].size.width);
     int right_w = MIN(light[j].size.height, light[j].size.width);
 
-    if ((left_h < right_h * 1.2 && left_w < right_w * 1.2) || (left_h > right_h * 0.8 && left_w > right_w * 0.8))
+    if ((left_h < right_h * 1.3 && left_w < right_w * 1.3) || (left_h > right_h * 0.7 && left_w > right_w * 0.7))
     {
         float h_max = (left_h + right_h) / 2.0f;
         // 两个灯条高度差不大
@@ -319,7 +309,7 @@ bool LightBar::light_judge(int i, int j)
             {
                 return true;
             }
-            if (w_max > h_max * 3.1f && w_max < h_max * 4.1f && fabs(light[i].angle - light[j].angle) <= 5)
+            if (w_max > h_max * 2.7f && w_max < h_max * 4.1f && fabs(light[i].angle - light[j].angle) < 10.0f)
             {
                 return true;
             }
@@ -368,27 +358,16 @@ Mat LightBar::armor_rect(int i, int j, Mat src_img, float angle)
 /**
  * @brief 多个装甲板筛选优先级
  * 
- * @return Point 最优先返回最大装甲板
+ * @return Point 返回离图像中心点最近的装甲板中心点
  */
 int LightBar::optimal_armor()
 {
-    size_t max = 0;
-    int max_num = 0;
     for (size_t i = 0; i < this->armor.size(); i += 2)
     {
-        if ((this->light[this->light_subscript[i]].angle > 0 && this->light[this->light_subscript[i + 1]].angle > 0) || (this->light[this->light_subscript[i]].angle < 0 && this->light[this->light_subscript[i + 1]].angle < 0))
+        //灯条是“\\”或者“//”和“||”这样
+        if (fabs(this->light[this->light_subscript[i]].angle - this->light[this->light_subscript[i + 1]].angle) < 5)
         {
-            //灯条是“\\”或者“//”和“||”这样
-            if (fabs(this->light[this->light_subscript[i]].angle - this->light[this->light_subscript[i + 1]].angle) < 8.0f)
-            {
-                this->priority.push_back(true);
-            }
-        }
-
-        //灯条是“| \”或者“/ |”
-        if ((fabs(this->light[this->light_subscript[i]].angle) < 2 && fabs(this->light[this->light_subscript[i + 1]].angle) > 5) || (fabs(this->light[this->light_subscript[i]].angle) > 5 && fabs(this->light[this->light_subscript[i + 1]].angle) < 2))
-        {
-            continue;
+            this->priority.push_back(true);
         }
 
         //灯条的高度差不超过最大灯条高度的四分之一
@@ -421,27 +400,9 @@ int LightBar::optimal_armor()
         {
             this->priority.push_back(true);
         }
-        if (this->priority.size() > 2)
-        {
-            if (this->priority.size() > max)
-            {
-                max = this->priority.size();
-                max_num = i;
-            }
-            else if (this->priority.size() == max)
-            {
-                //符合程度相同时选取更近的一位
-                int this_hamx = this->light[this->light_subscript[i]].size.height + this->light[this->light_subscript[i + 1]].size.height;
-                int max_hmaX = this->light[this->light_subscript[max_num]].size.height + this->light[this->light_subscript[max_num + 1]].size.height;
-                if (this_hamx > max_hmaX)
-                {
-                    max_num = i;
-                }
-            }
-        }
+
         this->priority.clear();
     }
-    return max_num;
 }
 
 /**

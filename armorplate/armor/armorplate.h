@@ -71,6 +71,6 @@ public:
     int blue_armor_gray_th = 80;
     int blue_armor_color_th = 135;
     //红色th参数
-    int red_armor_gray_th = 20; //视频20
-    int red_armor_color_th = 34;
+    int red_armor_gray_th = 225; //视频20
+    int red_armor_color_th = 50;
 };
