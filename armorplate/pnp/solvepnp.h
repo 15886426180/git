@@ -1,11 +1,5 @@
-#include <opencv2/opencv.hpp>
-#include <iostream>
-#include <math.h>
+#include "configure.h"
 #include "control.h"
-
-using namespace cv;
-using namespace std;
-
 class SolveP4p
 {
 public:
@@ -23,8 +17,8 @@ public:
     ~SolveP4p() {}
 
     //坐标赋值
-    void Rotate_Point(RotatedRect rects, RotatedRect light_left, RotatedRect light_right);
-    void run_SolvePnp(float _W, float _H);
+    float arrange_Point(RotatedRect rects, float _w, float _h);
+    float run_SolvePnp(float _W, float _H);
     void get_angle();
     void calcu_depth();
 

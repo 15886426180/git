@@ -1,8 +1,9 @@
-#include <armor/armorplate.h>
+#include "configure.h"
+#include "control.h"
+#include "Total operation/run.h"
 
 int main()
 {
-    ArmorPlate a;
-    a.run();
-    return 0;
+    WorKing run;
+    run.Run();
 }

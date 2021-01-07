@@ -21,11 +21,11 @@
 
 /*---- Serial header files ----*/
 #include <string.h>
-#include <fcntl.h>  //文件控制定义
-#include <termios.h>   //POSIX终端控制定义
-#include <unistd.h>    //UNIX标准定义
-#include <errno.h>     //ERROR数字定义
+#include <fcntl.h>   //文件控制定义
+#include <termios.h> //POSIX终端控制定义
+#include <unistd.h>  //UNIX标准定义
+#include <errno.h>   //ERROR数字定义
 #include <sys/select.h>
-
+/*---- Serial header files ----*/
 using namespace std;
 using namespace cv;

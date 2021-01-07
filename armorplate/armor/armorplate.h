@@ -1,10 +1,4 @@
-#include <opencv2/opencv.hpp>
-#include <iostream>
-#include "control.h"
-#include <math.h>
-
-using namespace cv;
-using namespace std;
+#include "configure.h"
 
 /**
  * @brief 装甲板识别模块的起点
@@ -13,7 +7,7 @@ using namespace std;
 class ArmorPlate
 {
 public:
-    Mat draw_img = Mat::zeros(Size(IMG_COLS, IMG_ROWS), CV_8UC3);
+    Mat draw_img = Mat::zeros(Size(CAMERA_RESOLUTION_COLS, CAMERA_RESOLUTION_ROWS), CV_8UC3);
     int rect_num = 0;
     int lost = 0;
     Rect armor_roi;
@@ -71,6 +65,6 @@ public:
     int blue_armor_gray_th = 80;
     int blue_armor_color_th = 135;
     //红色th参数
-    int red_armor_gray_th = 225; //视频20
-    int red_armor_color_th = 50;
+    int red_armor_gray_th = 30; //视频20
+    int red_armor_color_th = 20;
 };

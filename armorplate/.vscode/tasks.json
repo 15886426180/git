@@ -13,12 +13,20 @@
 			/* 说明整个项⽬所需的头⽂件路径（.h）*/
 			"-I","${workspaceFolder}/",
 			"-I","${workspaceFolder}/armor/",
+			"-I","${workspaceFolder}/pnp/",
+			"-I","${workspaceFolder}/serial/",
+			"-I","${workspaceFolder}/camera/",
+			"-I","${workspaceFolder}/Total operation/",
 			"-I","/usr/local/include/",
 			"-I","/usr/local/include/opencv4/",
 			"-I","/usr/local/include/opencv4/opencv2/",
 			/* 说明整个项⽬所需的源⽂件路径(.cpp) */
 			"-g",
 			"${workspaceFolder}/armor/armorplate.cpp",
+			"${workspaceFolder}/pnp/solvepnp.cpp",
+			"${workspaceFolder}/serial/serialport.cpp",
+			"${workspaceFolder}/Total operation/run.cpp",
+			"${workspaceFolder}/camera/videocapture.cpp",
 			"${workspaceFolder}/main.cpp",/* ${workspaceFolder}表⽰路径从当前项⽬⽂件夹开始 */
 			"-o", /* 编译输出⽂件的存放路径 */
 			"${workspaceFolder}/run.o", /* 要与launch.json⽂件⾥的program的内容保持⼀致 */
@@ -27,6 +35,7 @@
 			/* 也可以这样："${workspaceFolder}/run.o", */
 			/* OpenCV的lib库 */
 			"/usr/local/lib/libopencv_*",
+			"/lib/libMVSDK.so",//工业相机驱动
 		],
 		"options": {
 			"cwd": "${workspaceFolder}" /* 调试程序时的⼯作⽬录，⼀般为${workspaceFolder}即代码所在⽬录 */

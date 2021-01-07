@@ -1,6 +1,18 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+#define USB_CAPTURE_DEFULT 0
+/**
+  @brief: 相机的默认值
+  @note: 使用普通USB相机时，Opencv的VideoCapture接口的值
+*/
+
+#define ISOPEN_INDUSTRY_CAPTURE 0
+/**
+  @brief: 是否使用工业相机
+  @param: 0     使用工业相机
+  @param: 1     使用普通USB相机
+*/
 #define MAXIMUM_LOSS 2
 /**
  * @brief 最大丢失次数
@@ -55,17 +67,6 @@
   @param 1     是
 */
 
-#define IMG_COLS 640
-/**
- * @brief 图像宽度 640
- * 
- */
-#define IMG_ROWS 480
-/**
- * @brief 图像高度 480
- * 
- */
-
 #define Small_ARMORPLATE_WIDTH 125
 /**
  * @brief 小装甲板实际宽度(mm)
@@ -104,11 +105,11 @@
  * @brief 灯条实际宽度(mm)
  * 
  */
-#define CAMERA_EXPOSURETIME 800
+#define CAMERA_EXPOSURETIME 1600
 #define CAMERA_RESOLUTION_COLS 1280
 #define CAMERA_RESOLUTION_ROWS 800
-#define CAMERA_RESOLUTION_COLS_FOV ((1280-CAMERA_RESOLUTION_COLS)*0.5)
-#define CAMERA_RESOLUTION_ROWS_FOV ((1024-CAMERA_RESOLUTION_ROWS)*0.5)
+#define CAMERA_RESOLUTION_COLS_FOV ((1280 - CAMERA_RESOLUTION_COLS) * 0.5)
+#define CAMERA_RESOLUTION_ROWS_FOV ((1024 - CAMERA_RESOLUTION_ROWS) * 0.5)
 /**
   @brief: 设置相机的分辨率
   @param: CAMERA_EXPOSURETIME   相机曝光时间
@@ -119,7 +120,14 @@
          偏移值计算为 *** (相机最大分辨率 - 当前设置分辨率)/2 ***
 */
 /*---------------------------------------------------*/
+
+#if ISOPEN_INDUSTRY_CAPTURE == 1
 #define CAMERA_PARAM_FILE "/home/xx/github/armorplate/cameraParams.xml"
+
+#elif ISOPEN_INDUSTRY_CAPTURE == 0
+#define CAMERA_PARAM_FILE "/home/xx/github/armorplate/camera.xml"
+
+#endif
 /**
  * @brief 相机标定文件位置
  * 
@@ -129,5 +137,14 @@
  * @brief π
  * 
  */
-
+#define BIG_ARMORPLATE_WIDTH 255
+/**
+ * @brief 大装甲板宽度
+ * 
+ */
+#define CAMERA_HEIGHT 65
+/**
+ * @brief 相机高度
+ * 
+ */
 #endif

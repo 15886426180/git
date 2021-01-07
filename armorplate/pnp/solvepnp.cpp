@@ -10,37 +10,18 @@
  * @param light_left 左灯条旋转矩阵
  * @param light_right 右灯条旋转矩阵
  */
-void SolveP4p::Rotate_Point(RotatedRect rects, RotatedRect light_left, RotatedRect light_right)
+float SolveP4p::arrange_Point(RotatedRect rects, float _w, float _h)
 {
     this->target2d.clear();
-    int left_w = MAX(light_left.size.width, light_left.size.height) / 2;
-    int left_h = MIN(light_left.size.width, light_left.size.height) / 2;
-
-    int right_w = MAX(light_right.size.width, light_right.size.height) / 2;
-    int right_h = MIN(light_right.size.width, light_right.size.height) / 2;
-
     //左上
-    this->target2d.push_back(Point(light_left.center.x, light_left.center.y - left_h));
+    this->target2d.push_back(Point(rects.center.x - (rects.size.width / 2), rects.center.y - (rects.size.height / 2)));
     //右上
-    this->target2d.push_back(Point(light_right.center.x, light_right.center.y - right_h));
+    this->target2d.push_back(Point(rects.center.x + (rects.size.width / 2), rects.center.y - (rects.size.height / 2)));
     //右下
-    this->target2d.push_back(Point(light_right.center.x, light_right.center.y + left_h));
+    this->target2d.push_back(Point(rects.center.x + (rects.size.width / 2), rects.center.y + (rects.size.height / 2)));
     //左下
-    this->target2d.push_back(Point(light_left.center.x, light_left.center.y + left_h));
-
-    //保存装甲板中心点
-    this->armor_point = rects.center;
-    //小装甲板
-    if (rects.size.width - rects.size.height > rects.size.height / 2)
-    {
-        cout << "BIG" << endl;
-        run_SolvePnp(BIG_ARMORPLATE_WIDTH, ARMORPLATE_HIGHT);
-    }
-    else
-    {
-        cout << "SMALL" << endl;
-        run_SolvePnp(Small_ARMORPLATE_WIDTH, ARMORPLATE_HIGHT);
-    }
+    this->target2d.push_back(Point(rects.center.x - (rects.size.width / 2), rects.center.y + (rects.size.height / 2)));
+    return this->run_SolvePnp(_w, _h);
 }
 /**
  * @brief P4p计算旋转向量
@@ -48,7 +29,7 @@ void SolveP4p::Rotate_Point(RotatedRect rects, RotatedRect light_left, RotatedRe
  * @param _W 计算物品宽度
  * @param _H 计算物品高度
  */
-void SolveP4p::run_SolvePnp(float _W, float _H)
+float SolveP4p::run_SolvePnp(float _W, float _H)
 {
     float half_x = _W * 0.5;
     float half_y = _H * 0.5;
@@ -72,7 +53,8 @@ void SolveP4p::run_SolvePnp(float _W, float _H)
     //保存计算距离
     this->dist = sqrt(pow(this->world_point.at<double>(0, 2), 2) + pow(this->world_point.at<double>(0, 1), 2) + pow(this->world_point.at<double>(0, 0), 2));
     //修改精度，增添补偿函数
-    cout << this->dist << endl; //转换cm
+    // cout << this->dist << endl; //转换cm
+    return this->dist;
     //计算旋转角
     // get_angle();
 }
@@ -104,8 +86,8 @@ void SolveP4p::get_angle()
  */
 void SolveP4p::calcu_depth()
 {
-    int w = abs(IMG_COLS / 2 - armor_point.x);
-    int h = abs(IMG_ROWS / 2 - armor_point.y);
+    int w = abs(CAMERA_RESOLUTION_COLS / 2 - armor_point.x);
+    int h = abs(CAMERA_RESOLUTION_ROWS / 2 - armor_point.y);
     float d_s = CAMERA_HEIGHT / tan(this->theta_x + atan(h / cameraMatrix.at<double>(1, 1)));
     float k_s = w * sqrt(pow(d_s, 2) + pow(CAMERA_HEIGHT, 2)) / sqrt(pow(cameraMatrix.at<double>(0, 0), 2) + pow(h, 2));
     float d = (d_s / cos(atan(k_s / d_s))) * cos(atan(k_s / d_s) + this->theta_z);

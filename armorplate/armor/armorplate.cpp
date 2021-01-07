@@ -12,91 +12,9 @@ double Distance(Point a, Point b)
     return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 }
 
-/**
- * @brief 总运行函数-装甲板识别
- * 
- */
-void ArmorPlate::run()
-{
-    VideoCapture cap(0);
-    //检查是否成功打开
-    ImageProcess img;
-    LightBar rgb;
-    if (!cap.isOpened())
-    {
-        cout << "打开失败" << endl;
-    }
-
-    for (;;)
-    {
-        double t = (double)cv::getTickCount(); //开始计时
-        this->success_armor = false;
-        Mat frame;
-        cap.read(frame);
-        Mat src_img;
-        resize(frame, src_img, Size(IMG_COLS, IMG_ROWS));
-#if ROI_IMG == 1
-        if (this->lost_success_armor)
-        {
-            src_img = src_img(this->armor_roi);
-        }
-#endif
-        //图像预处理
-        img.pretreat(src_img, COLOR);
-        //找到灯条后
-
-        if (rgb.find_light(img.mask))
-        {
-            //装甲板大于等于1块时
-            if (rgb.armor_fitting(img.gray_img))
-            {
-                this->rect_num = rgb.optimal_armor();
-#if DRAW_ARMOR_IMG == 1
-                rectangle(this->draw_img, rgb.armor[this->rect_num].boundingRect(), Scalar(0, 255, 0), 3, 8);
-                rectangle(this->draw_img, rgb.roi_rect.boundingRect(), Scalar(255, 200, 0), 3, 8);
-                rectangle(src_img, rgb.armor[this->rect_num].boundingRect(), Scalar(0, 255, 0), 3, 8);
-                rectangle(src_img, rgb.roi_rect.boundingRect(), Scalar(255, 200, 0), 3, 8);
-#endif
-                this->success_armor = true;
-            }
-            else //丢失目标
-            {
-
-                //扩大搜索目标
-#if ROI_IMG == 1
-                this->lost++;
-                rgb.roi_rect = RotatedRect(
-                    Point(IMG_COLS / 2, IMG_ROWS / 2),
-                    Size(IMG_COLS, IMG_ROWS),
-                    rgb.roi_rect.angle);
-#endif
-            }
-        }
-
-#if ROI_IMG == 1
-        this->armor_roi = rgb.roi_rect.boundingRect(); //保存roi位置
-#endif
-        rgb.eliminate();
-        this->eliminate();
-
-        imshow("frame", src_img);
-        imshow("draw", this->draw_img);
-
-        t = ((double)cv::getTickCount() - t) / cv::getTickFrequency(); //结束计时
-        int fps = int(1.0 / t);                                        //转换为帧率
-        cout << "FPS: " << fps << endl;                                //输出帧率
-
-        char c = waitKey(1);
-        if (c == 27) //"Esc"-退出
-        {
-            break;
-        }
-    }
-}
-
 void ArmorPlate::eliminate()
 {
-    this->draw_img = Mat::zeros(Size(IMG_COLS, IMG_ROWS), CV_8UC3);
+    this->draw_img = Mat::zeros(Size(CAMERA_RESOLUTION_COLS, CAMERA_RESOLUTION_ROWS), CV_8UC3);
     this->rect_num = 0;
     this->lost_success_armor = this->success_armor; //保存上一帧的参数
     this->success_armor = false;
@@ -144,8 +62,8 @@ void ImageProcess::pretreat(Mat src_img, int enemy_color)
     {
         subtract(_split[2], _split[0], bin_img_color); // r - b
 #if IS_PARAM_ADJUSTMENT == 1
-        createTrackbar("GRAY_TH_BLUE:", "src_img", &this->red_armor_gray_th, 255);
-        createTrackbar("COLOR_TH_BLUE:", "src_img", &this->red_armor_color_th, 255);
+        createTrackbar("GRAY_TH_RED:", "src_img", &this->red_armor_gray_th, 255);
+        createTrackbar("COLOR_TH_RED:", "src_img", &this->red_armor_color_th, 255);
         threshold(gray_img, bin_img_gray, this->red_armor_gray_th, 255, THRESH_BINARY);
         threshold(bin_img_color, bin_img_color, this->red_armor_color_th, 255, THRESH_BINARY);
 #elif IS_PARAM_ADJUSTMENT == 0
@@ -362,6 +280,8 @@ Mat LightBar::armor_rect(int i, int j, Mat src_img, float angle)
  */
 int LightBar::optimal_armor()
 {
+    size_t max = 0;
+    int max_num = 0;
     for (size_t i = 0; i < this->armor.size(); i += 2)
     {
         //灯条是“\\”或者“//”和“||”这样
@@ -400,9 +320,21 @@ int LightBar::optimal_armor()
         {
             this->priority.push_back(true);
         }
-
+        if (this->priority.size() > max)
+        {
+            max = this->priority.size();
+            max_num = i;
+        }
+        else if (this->priority.size() == max)
+        {
+            if (this->armor[i / 2].size.width * this->armor[i / 2].size.height > this->armor[max_num].size.width * this->armor[max_num].size.height)
+            {
+                max_num = i;
+            }
+        }
         this->priority.clear();
     }
+    return max_num;
 }
 
 /**
@@ -435,8 +367,8 @@ void LightBar::coordinate_change(int i)
     {
         //丢失过多取消ROI
         this->roi_rect = RotatedRect(
-            Point(IMG_COLS / 2, IMG_ROWS / 2),
-            Size(IMG_COLS, IMG_ROWS),
+            Point(CAMERA_RESOLUTION_COLS / 2, CAMERA_RESOLUTION_ROWS / 2),
+            Size(CAMERA_RESOLUTION_COLS, CAMERA_RESOLUTION_ROWS),
             this->roi_rect.angle);
     }
 }
