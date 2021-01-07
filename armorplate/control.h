@@ -53,7 +53,7 @@
  * @param 0 不显示
  */
 
-#define COLOR 1
+#define COLOR 0
 /**
  * @brief 敌方颜色
  * @param 1 红色
@@ -93,7 +93,7 @@
  * @brief Y轴焦距
  * 
  */
-#define CALL_PNP 1
+#define CALL_PNP 0
 /**
  * @brief 是否调用测距
  * @param 0     否
@@ -105,7 +105,7 @@
  * @brief 灯条实际宽度(mm)
  * 
  */
-#define CAMERA_EXPOSURETIME 1600
+#define CAMERA_EXPOSURETIME 300
 #define CAMERA_RESOLUTION_COLS 1280
 #define CAMERA_RESOLUTION_ROWS 800
 #define CAMERA_RESOLUTION_COLS_FOV ((1280 - CAMERA_RESOLUTION_COLS) * 0.5)
@@ -125,7 +125,7 @@
 #define CAMERA_PARAM_FILE "/home/xx/github/armorplate/cameraParams.xml"
 
 #elif ISOPEN_INDUSTRY_CAPTURE == 0
-#define CAMERA_PARAM_FILE "/home/xx/github/armorplate/camera.xml"
+#define CAMERA_PARAM_FILE "/home/sms/下载/git-master (2)/git-master/armorplate/camera.xml"
 
 #endif
 /**

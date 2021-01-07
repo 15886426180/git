@@ -1,4 +1,8 @@
+#include "control.h"
 #include "configure.h"
+
+using namespace cv;
+using namespace std;
 
 /**
  * @brief 装甲板识别模块的起点
@@ -13,6 +17,7 @@ public:
     Rect armor_roi;
     bool lost_success_armor = false;
     bool success_armor = false;
+    int depth = 0;
     void eliminate();
     void run();
     ArmorPlate() {}
@@ -32,7 +37,7 @@ public:
     vector<int> light_subscript;     //灯条下标
     vector<bool> priority;           //优先级
     float light_aspect_ratio = 0.6f; //灯条长宽比
-    float light_angle = 45.0;        //灯条角度
+    float light_angle = 60.0;        //灯条角度
     bool armor_fitting(Mat src_img);
     bool light_judge(int i, int j);
     bool find_light(Mat mask);
@@ -62,9 +67,9 @@ public:
     Mat mask;
     Mat gray_img;
     //蓝色th参数
-    int blue_armor_gray_th = 80;
-    int blue_armor_color_th = 135;
+    int blue_armor_gray_th = 30;
+    int blue_armor_color_th = 21;
     //红色th参数
-    int red_armor_gray_th = 30; //视频20
-    int red_armor_color_th = 20;
+    int red_armor_gray_th = 20; //视频20
+    int red_armor_color_th = 34;
 };

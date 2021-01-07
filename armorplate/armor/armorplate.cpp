@@ -7,10 +7,11 @@
  * @param b 点B
  * @return double 两点之间的距离 
  */
-double Distance(Point a, Point b)
+float Distance(Point a, Point b)
 {
     return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 }
+
 
 void ArmorPlate::eliminate()
 {
@@ -62,8 +63,8 @@ void ImageProcess::pretreat(Mat src_img, int enemy_color)
     {
         subtract(_split[2], _split[0], bin_img_color); // r - b
 #if IS_PARAM_ADJUSTMENT == 1
-        createTrackbar("GRAY_TH_RED:", "src_img", &this->red_armor_gray_th, 255);
-        createTrackbar("COLOR_TH_RED:", "src_img", &this->red_armor_color_th, 255);
+        createTrackbar("GRAY_TH_BLUE:", "src_img", &this->red_armor_gray_th, 255);
+        createTrackbar("COLOR_TH_BLUE:", "src_img", &this->red_armor_color_th, 255);
         threshold(gray_img, bin_img_gray, this->red_armor_gray_th, 255, THRESH_BINARY);
         threshold(bin_img_color, bin_img_color, this->red_armor_color_th, 255, THRESH_BINARY);
 #elif IS_PARAM_ADJUSTMENT == 0
@@ -71,13 +72,13 @@ void ImageProcess::pretreat(Mat src_img, int enemy_color)
         threshold(bin_img_color, bin_img_color, red_armor_color_th, 255, THRESH_BINARY);
 #endif
     }
-    Mat element = getStructuringElement(MORPH_ELLIPSE, cv::Size(5, 9));
+    Mat element = getStructuringElement(MORPH_ELLIPSE, cv::Size(11, 9));
 #if SHOW_BIN_IMG == 1
     imshow("gray_img", bin_img_gray);
     imshow("mask", bin_img_color);
 #endif
     bitwise_and(bin_img_color, bin_img_gray, bin_img_color);
-    medianBlur(bin_img_color, bin_img_color, 3);
+    // medianBlur(bin_img_color, bin_img_color, 5);
     dilate(bin_img_color, bin_img_color, element);
 
 #if SHOW_BIN_IMG == 1
@@ -215,21 +216,23 @@ bool LightBar::light_judge(int i, int j)
     int right_h = MAX(light[j].size.height, light[j].size.width);
     int right_w = MIN(light[j].size.height, light[j].size.width);
 
-    if ((left_h < right_h * 1.3 && left_w < right_w * 1.3) || (left_h > right_h * 0.7 && left_w > right_w * 0.7))
+    if (left_h < right_h * 1.4 && left_w > right_w * 0.6)
     {
         float h_max = (left_h + right_h) / 2.0f;
         // 两个灯条高度差不大
         if (fabs(light[i].center.y - light[j].center.y) < 0.8f * h_max)
         {
             //装甲板长宽比
-            float w_max = light[j].center.x - light[i].center.x;
-            if (w_max < h_max * 2.6f && w_max > h_max * 0.6)
+            float w_max = Distance(light[j].center, light[i].center);
+            if (w_max < h_max * 2.3f && w_max > h_max * 0.5f)
             {
                 return true;
+     
             }
-            if (w_max > h_max * 2.7f && w_max < h_max * 4.1f && fabs(light[i].angle - light[j].angle) < 10.0f)
+            if (w_max > h_max * 3.9f && w_max < h_max * 4.1f && fabs(light[i].angle - light[j].angle) <= 1.25f)
             {
-                return true;
+                
+                return true; 
             }
         }
     }
@@ -276,18 +279,25 @@ Mat LightBar::armor_rect(int i, int j, Mat src_img, float angle)
 /**
  * @brief 多个装甲板筛选优先级
  * 
- * @return Point 返回离图像中心点最近的装甲板中心点
+ * @return Point 最优先返回最大装甲板
  */
 int LightBar::optimal_armor()
 {
     size_t max = 0;
     int max_num = 0;
+    if(this->armor.size()<1)return 0;
     for (size_t i = 0; i < this->light_subscript.size(); i += 2)
     {
-        //灯条是“\\”或者“//”和“||”这样
-        if (fabs(this->light[this->light_subscript[i]].angle - this->light[this->light_subscript[i + 1]].angle) < 5)
+            //灯条是“\\”或者“//”和“||”这样
+            if (fabs(this->light[this->light_subscript[i]].angle - this->light[this->light_subscript[i + 1]].angle) < 10.0f)
+            {
+                this->priority.push_back(true);
+            }
+
+        //灯条是“| \”或者“/ |”
+        if ((fabs(this->light[this->light_subscript[i]].angle) < 2 && fabs(this->light[this->light_subscript[i + 1]].angle) > 5) || (fabs(this->light[this->light_subscript[i]].angle) > 5 && fabs(this->light[this->light_subscript[i + 1]].angle) < 2))
         {
-            this->priority.push_back(true);
+            continue;
         }
 
         //灯条的高度差不超过最大灯条高度的四分之一
@@ -320,16 +330,22 @@ int LightBar::optimal_armor()
         {
             this->priority.push_back(true);
         }
-        if (this->priority.size() > max)
+        if (this->priority.size() > 2)
         {
-            max = this->priority.size();
-            max_num = i;
-        }
-        else if (this->priority.size() == max)
-        {
-            if (this->armor[i / 2].size.width * this->armor[i / 2].size.height > this->armor[max_num].size.width * this->armor[max_num].size.height)
+            if (this->priority.size() > max)
             {
+                max = this->priority.size();
                 max_num = i;
+            }
+            else if (this->priority.size() == max)
+            {
+                //符合程度相同时选取更近的一位
+                int this_hamx = this->light[this->light_subscript[i]].size.height + this->light[this->light_subscript[i + 1]].size.height;
+                int max_hmaX = this->light[this->light_subscript[max_num]].size.height + this->light[this->light_subscript[max_num + 1]].size.height;
+                if (this_hamx > max_hmaX)
+                {
+                    max_num = i;
+                }
             }
         }
         this->priority.clear();

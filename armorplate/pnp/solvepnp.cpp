@@ -49,7 +49,6 @@ float SolveP4p::run_SolvePnp(float _W, float _H)
     this->rvec_invert = this->rotM.inv(DECOMP_LU);
     this->world_point = this->rvec_invert * this->tvec;
 
-    //120cm精度在-1cm 200cm精度在+2cm
     //保存计算距离
     this->dist = sqrt(pow(this->world_point.at<double>(0, 2), 2) + pow(this->world_point.at<double>(0, 1), 2) + pow(this->world_point.at<double>(0, 0), 2));
     //修改精度，增添补偿函数
