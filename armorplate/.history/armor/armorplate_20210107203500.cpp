@@ -225,15 +225,15 @@ bool LightBar::light_judge(int i, int j)
     int right_h = MAX(light[j].size.height, light[j].size.width);
     int right_w = MIN(light[j].size.height, light[j].size.width);
 
-    if (left_h < right_h * 1.4 && left_w > right_w * 0.5 && left_h > right_h * 0.6 && left_w < right_w * 2)
+    if (left_h < right_h * 1.5 && left_w > right_w * 0.5)
     {
         float h_max = (left_h + right_h) / 2.0f;
         // 两个灯条高度差不大
         if (fabs(light[i].center.y - light[j].center.y) < 0.8f * h_max)
         {
             //装甲板长宽比
-            float w_max = light[j].center.x - light[i].center.x;   
-            if (w_max < h_max * 2.45 && w_max > h_max * 0.5f)
+            float w_max = Distance(light[j].center, light[i].center);
+            if (w_max < h_max * 2.3f && w_max > h_max * 0.5f)
             {
                 return true;
      

@@ -72,7 +72,7 @@ void ImageProcess::pretreat(Mat src_img, int enemy_color)
         threshold(bin_img_color, bin_img_color, red_armor_color_th, 255, THRESH_BINARY);
 #endif
     }
-    Mat element = getStructuringElement(MORPH_ELLIPSE, cv::Size(7, 11));
+    Mat element = getStructuringElement(MORPH_ELLIPSE, cv::Size(11, 9));
 #if SHOW_BIN_IMG == 1
     imshow("gray_img", bin_img_gray);
     imshow("mask", bin_img_color);
@@ -225,15 +225,15 @@ bool LightBar::light_judge(int i, int j)
     int right_h = MAX(light[j].size.height, light[j].size.width);
     int right_w = MIN(light[j].size.height, light[j].size.width);
 
-    if (left_h < right_h * 1.4 && left_w > right_w * 0.5 && left_h > right_h * 0.6 && left_w < right_w * 2)
+    if (left_h < right_h * 1.2 && left_w > right_w * 0.8)
     {
         float h_max = (left_h + right_h) / 2.0f;
         // 两个灯条高度差不大
         if (fabs(light[i].center.y - light[j].center.y) < 0.8f * h_max)
         {
             //装甲板长宽比
-            float w_max = light[j].center.x - light[i].center.x;   
-            if (w_max < h_max * 2.45 && w_max > h_max * 0.5f)
+            float w_max = Distance(light[j].center, light[i].center);
+            if (w_max < h_max * 2.3f && w_max > h_max * 0.5f)
             {
                 return true;
      
@@ -295,7 +295,7 @@ int LightBar::optimal_armor()
 {
     size_t max = 0;
     int max_num = 0;
-    if(this->armor.size()<=1)return 0;
+    if(this->armor.size()<1)return 0;
     for (size_t i = 0; i < this->light_subscript.size(); i += 2)
     {
             //灯条是“\\”或者“//”和“||”这样
@@ -313,7 +313,7 @@ int LightBar::optimal_armor()
         int right_h = MAX(this->light[this->light_subscript[i + 1]].size.width, this->light[this->light_subscript[i + 1]].size.height);
         int _h = MAX(left_h, right_h) / 4;
         int h_ = MIN(left_h, right_h);
-        if (fabs(this->light[this->light_subscript[i]].center.y - this->light[this->light_subscript[i + 1]].center.y) < _h/2)
+        if (fabs(this->light[this->light_subscript[i]].center.y - this->light[this->light_subscript[i + 1]].center.y) < h_/2)
         {
             this->priority.push_back(true);
         }
@@ -328,13 +328,14 @@ int LightBar::optimal_armor()
         float delta_y = this->light[this->light_subscript[i]].center.y - this->light[this->light_subscript[i + 1]].center.y;
         float delta_x = this->light[this->light_subscript[i]].center.x - this->light[this->light_subscript[i + 1]].center.x;
         float deviationAngle = abs(atan(delta_y / delta_x)) * 180 / CV_PI;
-        if (deviationAngle < 40)
+        if (deviationAngle < 50)
         {
             this->priority.push_back(true);
         }
 
         //灯条的中心店到装甲板中心点的距离超过最小灯条的宽度
-        if (Distance(this->armor[i / 2].center, this->light[this->light_subscript[i]].center) > h_/2 && Distance(this->armor[i / 2].center, this->light[this->light_subscript[i + 1]].center) > h_/2)
+        int h_ = MIN(left_h, right_h);
+        if (Distance(this->armor[i / 2].center, this->light[this->light_subscript[i]].center) > h_ && Distance(this->armor[i / 2].center, this->light[this->light_subscript[i + 1]].center) > h_)
         {
             this->priority.push_back(true);
         }
@@ -348,9 +349,9 @@ int LightBar::optimal_armor()
             else if (this->priority.size() == max)
             {
                 //符合程度相同时选取更近的一位
-                int this_wamx = Distance(this->light[this->light_subscript[i]].center , this->light[this->light_subscript[i + 1]].center);
-                int max_wmax = Distance(this->light[this->light_subscript[max_num]].center , this->light[this->light_subscript[max_num + 1]].center);
-                if (this_wamx > max_wmax)
+                int this_hamx = this->light[this->light_subscript[i]].size.height + this->light[this->light_subscript[i + 1]].size.height;
+                int max_hmaX = this->light[this->light_subscript[max_num]].size.height + this->light[this->light_subscript[max_num + 1]].size.height;
+                if (this_hamx > max_hmaX)
                 {
                     max_num = i;
                 }

@@ -72,7 +72,7 @@ void ImageProcess::pretreat(Mat src_img, int enemy_color)
         threshold(bin_img_color, bin_img_color, red_armor_color_th, 255, THRESH_BINARY);
 #endif
     }
-    Mat element = getStructuringElement(MORPH_ELLIPSE, cv::Size(7, 11));
+    Mat element = getStructuringElement(MORPH_ELLIPSE, cv::Size(11, 9));
 #if SHOW_BIN_IMG == 1
     imshow("gray_img", bin_img_gray);
     imshow("mask", bin_img_color);
@@ -225,15 +225,15 @@ bool LightBar::light_judge(int i, int j)
     int right_h = MAX(light[j].size.height, light[j].size.width);
     int right_w = MIN(light[j].size.height, light[j].size.width);
 
-    if (left_h < right_h * 1.4 && left_w > right_w * 0.5 && left_h > right_h * 0.6 && left_w < right_w * 2)
+    if (left_h < right_h * 1.5 && left_w > right_w * 0.5)
     {
         float h_max = (left_h + right_h) / 2.0f;
         // 两个灯条高度差不大
         if (fabs(light[i].center.y - light[j].center.y) < 0.8f * h_max)
         {
             //装甲板长宽比
-            float w_max = light[j].center.x - light[i].center.x;   
-            if (w_max < h_max * 2.45 && w_max > h_max * 0.5f)
+            float w_max = Distance(light[j].center, light[i].center);
+            if (w_max < h_max * 2.3f && w_max > h_max * 0.5f)
             {
                 return true;
      
@@ -328,7 +328,7 @@ int LightBar::optimal_armor()
         float delta_y = this->light[this->light_subscript[i]].center.y - this->light[this->light_subscript[i + 1]].center.y;
         float delta_x = this->light[this->light_subscript[i]].center.x - this->light[this->light_subscript[i + 1]].center.x;
         float deviationAngle = abs(atan(delta_y / delta_x)) * 180 / CV_PI;
-        if (deviationAngle < 40)
+        if (deviationAngle < 50)
         {
             this->priority.push_back(true);
         }

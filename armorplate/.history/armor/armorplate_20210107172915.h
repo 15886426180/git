@@ -66,7 +66,7 @@ public:
     Mat mask;
     Mat gray_img;
     //蓝色th参数
-    int blue_armor_gray_th = 50;
+    int blue_armor_gray_th = 30;
     int blue_armor_color_th = 21;
     //红色th参数
     int red_armor_gray_th = 20; //视频20

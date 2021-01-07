@@ -25,7 +25,7 @@
  * @param 0 不截取 
  * 有问题还没改好
  */
-#define FPS_SHOW 0
+#define FPS_SHOW 1
 /**
  * @brief 是否显示帧数
  * @param 1 显示

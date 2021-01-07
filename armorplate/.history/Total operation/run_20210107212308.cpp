@@ -35,7 +35,10 @@ void WorKing::Run()
             if (rgb.armor_fitting(img.gray_img))
             {
                 armor.rect_num = rgb.optimal_armor()/2;
-                
+                float left_depth = pnp.arrange_Point(rgb.light[armor.rect_num], LIGHT_WIDITH, ARMORPLATE_HIGHT);
+                float right_depth = pnp.arrange_Point(rgb.light[armor.rect_num+1], LIGHT_WIDITH, ARMORPLATE_HIGHT);
+                float depth = (0.7* MAX(left_depth, right_depth) + 0.3*MIN(left_depth, right_depth));
+                cout<<depth<<endl;
 #if DRAW_ARMOR_IMG == 1
                 rectangle(armor.draw_img, rgb.armor[armor.rect_num].boundingRect(), Scalar(0, 255, 0), 3, 8);
                 rectangle(armor.draw_img, rgb.roi_rect.boundingRect(), Scalar(255, 200, 0), 3, 8);

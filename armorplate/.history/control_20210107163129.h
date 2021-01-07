@@ -25,7 +25,7 @@
  * @param 0 不截取 
  * 有问题还没改好
  */
-#define FPS_SHOW 0
+#define FPS_SHOW 1
 /**
  * @brief 是否显示帧数
  * @param 1 显示
@@ -125,7 +125,7 @@
 #define CAMERA_PARAM_FILE "/home/xx/github/armorplate/cameraParams.xml"
 
 #elif ISOPEN_INDUSTRY_CAPTURE == 0
-#define CAMERA_PARAM_FILE "/home/duguxiaochong/桌面/git-master (2)/git-master/armorplate/camera.xml"
+#define CAMERA_PARAM_FILE "/home/sms/下载/git-master (2)/git-master/armorplate/camera.xml"
 
 #endif
 /**
