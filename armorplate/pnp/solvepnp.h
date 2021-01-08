@@ -21,6 +21,8 @@ public:
     float run_SolvePnp(float _W, float _H);
     void get_angle();
     void calcu_depth();
+    //小孔成像
+    float Pinhole_imaging(RotatedRect rects, float _h);
 
     Point armor_point;
     vector<Point2f> target2d;

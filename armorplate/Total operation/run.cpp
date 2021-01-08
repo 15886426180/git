@@ -34,17 +34,17 @@ void WorKing::Run()
             //装甲板大于等于1块时
             if (rgb.armor_fitting(img.gray_img))
             {
-                armor.rect_num = rgb.optimal_armor()/2;
-                
+                armor.rect_num = rgb.optimal_armor() / 2;
+                //小孔成像
+                float left_light_depth = pnp.Pinhole_imaging(rgb.light[armor.rect_num * 2], ARMORPLATE_HIGHT);
+                float right_light_depth = pnp.Pinhole_imaging(rgb.light[armor.rect_num * 2 + 1], ARMORPLATE_HIGHT);
+                float depth = ((MIN(left_light_depth, right_light_depth) * 0.4) + (MAX(left_light_depth, right_light_depth) * 0.6));
 #if DRAW_ARMOR_IMG == 1
                 rectangle(armor.draw_img, rgb.armor[armor.rect_num].boundingRect(), Scalar(0, 255, 0), 3, 8);
                 rectangle(armor.draw_img, rgb.roi_rect.boundingRect(), Scalar(255, 200, 0), 3, 8);
                 rectangle(src_img, rgb.armor[armor.rect_num].boundingRect(), Scalar(0, 255, 0), 3, 8);
                 rectangle(src_img, rgb.roi_rect.boundingRect(), Scalar(255, 200, 0), 3, 8);
 #endif
-                // float left_depth = pnp.arrange_Point(rgb.light[rgb.light_subscript[armor.rect_num * 2]], LIGHT_WIDITH, ARMORPLATE_HIGHT);
-                // float right_depth = pnp.arrange_Point(rgb.light[rgb.light_subscript[armor.rect_num * 2 + 1]], LIGHT_WIDITH, ARMORPLATE_HIGHT);
-                // cout << (left_depth + right_depth) / 2 << endl;
                 armor.success_armor = true;
             }
             else //丢失目标

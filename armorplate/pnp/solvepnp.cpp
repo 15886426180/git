@@ -96,3 +96,10 @@ void SolveP4p::calcu_depth()
 
     cout << depth << endl;
 }
+
+float SolveP4p::Pinhole_imaging(RotatedRect rects, float _h)
+{
+    float light_h = MAX(rects.size.height, rects.size.width);
+    float dist = _h * this->cameraMatrix.at<uchar>(1, 1) / light_h;
+    cout << dist << endl;
+}
