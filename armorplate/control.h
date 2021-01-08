@@ -67,7 +67,7 @@
   @param 1     是
 */
 
-#define Small_ARMORPLATE_WIDTH 125
+#define SMALL_ARMORPLATE_WIDTH 125
 /**
  * @brief 小装甲板实际宽度(mm)
  * 

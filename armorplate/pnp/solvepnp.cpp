@@ -21,6 +21,44 @@ float SolveP4p::arrange_Point(RotatedRect rects, float _w, float _h)
     this->target2d.push_back(Point(rects.center.x + (rects.size.width / 2), rects.center.y + (rects.size.height / 2)));
     //左下
     this->target2d.push_back(Point(rects.center.x - (rects.size.width / 2), rects.center.y + (rects.size.height / 2)));
+
+    return this->run_SolvePnp(_w, _h);
+}
+/**
+ * @brief 
+ * 
+ * @param rects 
+ * @param _w 
+ * @param _h 
+ * @return float 
+ */
+float SolveP4p::armor_Point(RotatedRect left_light, float _w, float _h)
+{
+    this->target2d.clear();
+    if (_w / _h < 3)
+    {
+        //左上
+        this->target2d.push_back(Point(left_light.center.x - (left_light.size.width / 2), left_light.center.y - (left_light.size.height / 2)));
+        //右上
+        this->target2d.push_back(Point(left_light.center.x + (left_light.size.height * 2.27), left_light.center.y - (left_light.size.height / 2)));
+        //右下
+        this->target2d.push_back(Point(left_light.center.x + (left_light.size.height * 2.27), left_light.center.y + (left_light.size.height / 2)));
+        //左下
+        this->target2d.push_back(Point(left_light.center.x - (left_light.size.width / 2), left_light.center.y - (left_light.size.height / 2)));
+    }
+    else
+    {
+        //左上
+        this->target2d.push_back(Point(left_light.center.x - (left_light.size.width / 2), left_light.center.y - (left_light.size.height / 2)));
+        //右上
+        this->target2d.push_back(Point(left_light.center.x + (left_light.size.height * 4.63), left_light.center.y - (left_light.size.height / 2)));
+        //右下
+        this->target2d.push_back(Point(left_light.center.x + (left_light.size.height * 4.63), left_light.center.y + (left_light.size.height / 2)));
+        //左下
+        this->target2d.push_back(Point(left_light.center.x - (left_light.size.width / 2), left_light.center.y - (left_light.size.height / 2)));
+    }
+
+    //计算pnp
     return this->run_SolvePnp(_w, _h);
 }
 /**
@@ -49,11 +87,8 @@ float SolveP4p::run_SolvePnp(float _W, float _H)
     this->rvec_invert = this->rotM.inv(DECOMP_LU);
     this->world_point = this->rvec_invert * this->tvec;
 
-    //120cm精度在-1cm 200cm精度在+2cm
-    //保存计算距离
     this->dist = sqrt(pow(this->world_point.at<double>(0, 2), 2) + pow(this->world_point.at<double>(0, 1), 2) + pow(this->world_point.at<double>(0, 0), 2));
-    //修改精度，增添补偿函数
-    // cout << this->dist << endl; //转换cm
+
     return this->dist;
     //计算旋转角
     // get_angle();

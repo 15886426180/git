@@ -35,10 +35,25 @@ void WorKing::Run()
             if (rgb.armor_fitting(img.gray_img))
             {
                 armor.rect_num = rgb.optimal_armor() / 2;
-                //小孔成像
-                float left_light_depth = pnp.Pinhole_imaging(rgb.light[armor.rect_num * 2], ARMORPLATE_HIGHT);
-                float right_light_depth = pnp.Pinhole_imaging(rgb.light[armor.rect_num * 2 + 1], ARMORPLATE_HIGHT);
-                float depth = ((MIN(left_light_depth, right_light_depth) * 0.4) + (MAX(left_light_depth, right_light_depth) * 0.6));
+                //小孔成像(正面效果还行)
+                // float left_light_depth = pnp.Pinhole_imaging(rgb.light[armor.rect_num * 2], ARMORPLATE_HIGHT);
+                // float right_light_depth = pnp.Pinhole_imaging(rgb.light[armor.rect_num * 2 + 1], ARMORPLATE_HIGHT);
+                // float depth = ((MIN(left_light_depth, right_light_depth) * 0.4) + (MAX(left_light_depth, right_light_depth) * 0.6));
+                if (rgb.armor[armor.rect_num].size.width / rgb.armor[armor.rect_num].size.width > 3)
+                {
+                    float left_light_depth = pnp.armor_Point(rgb.light[armor.rect_num * 2], BIG_ARMORPLATE_WIDTH, ARMORPLATE_HIGHT);
+                    float right_light_depth = pnp.armor_Point(rgb.light[armor.rect_num * 2 + 1], BIG_ARMORPLATE_WIDTH, ARMORPLATE_HIGHT);
+                    float depth = (left_light_depth + right_light_depth) / 20;
+                    cout << depth << endl;
+                }
+                else
+                {
+                    float left_light_depth = pnp.armor_Point(rgb.light[armor.rect_num * 2], SMALL_ARMORPLATE_WIDTH, ARMORPLATE_HIGHT);
+                    float right_light_depth = pnp.armor_Point(rgb.light[armor.rect_num * 2 + 1], SMALL_ARMORPLATE_WIDTH, ARMORPLATE_HIGHT);
+                    float depth = (left_light_depth + right_light_depth) / 20;
+                    cout << depth << endl;
+                }
+
 #if DRAW_ARMOR_IMG == 1
                 rectangle(armor.draw_img, rgb.armor[armor.rect_num].boundingRect(), Scalar(0, 255, 0), 3, 8);
                 rectangle(armor.draw_img, rgb.roi_rect.boundingRect(), Scalar(255, 200, 0), 3, 8);
