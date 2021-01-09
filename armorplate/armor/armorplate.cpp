@@ -63,8 +63,8 @@ void ImageProcess::pretreat(Mat src_img, int enemy_color)
     {
         subtract(_split[2], _split[0], bin_img_color); // r - b
 #if IS_PARAM_ADJUSTMENT == 1
-        createTrackbar("GRAY_TH_BLUE:", "src_img", &this->red_armor_gray_th, 255);
-        createTrackbar("COLOR_TH_BLUE:", "src_img", &this->red_armor_color_th, 255);
+        createTrackbar("GRAY_TH_RED:", "src_img", &this->red_armor_gray_th, 255);
+        createTrackbar("COLOR_TH_RED:", "src_img", &this->red_armor_color_th, 255);
         threshold(gray_img, bin_img_gray, this->red_armor_gray_th, 255, THRESH_BINARY);
         threshold(bin_img_color, bin_img_color, this->red_armor_color_th, 255, THRESH_BINARY);
 #elif IS_PARAM_ADJUSTMENT == 0
@@ -239,7 +239,7 @@ bool LightBar::light_judge(int i, int j)
      
             }
 
-            if (w_max > h_max * 3.9f && w_max < h_max * 4.1f && fabs(light[i].angle - light[j].angle) <= 1.25f)
+            if (w_max > h_max * 3.05f && w_max < h_max * 4.6f )
             {
                 
                 return true; 

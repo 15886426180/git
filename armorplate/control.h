@@ -53,7 +53,7 @@
  * @param 0 不显示
  */
 
-#define COLOR 0
+#define COLOR 1
 /**
  * @brief 敌方颜色
  * @param 1 红色
@@ -125,7 +125,7 @@
 #define CAMERA_PARAM_FILE "/home/xx/github/armorplate/cameraParams.xml"
 
 #elif ISOPEN_INDUSTRY_CAPTURE == 0
-#define CAMERA_PARAM_FILE "/home/duguxiaochong/桌面/git-master (2)/git-master/armorplate/camera.xml"
+#define CAMERA_PARAM_FILE "/home/sms/桌面/git-master (4)/git-master/armorplate/camera.xml"
 
 #endif
 /**
@@ -142,9 +142,26 @@
  * @brief 大装甲板宽度
  * 
  */
-#define CAMERA_HEIGHT 65
+#define CAMERA_HEIGHT 700
 /**
  * @brief 相机高度
  * 
  */
+
+#define ANTI_RANGE 1.01//指数增长的底数
+#define ACC 0.000001f/
+#define MNC 0.0000000001f//测量协方差矩阵R，更大会有更慢的回归
+#define DEAD_BAND 0
+#define SIZE_X 960
+#define SIZE_Y 480
+
+//启用pid修正
+#define PID
+// pid修正参数
+#define WIDTH 640
+#define HEIGHT 480
+
+#define KP 0.6
+#define KI 0.02
+#define KD 0.1
 #endif

@@ -20,10 +20,11 @@ public:
     float arrange_Point(RotatedRect rects, float _w, float _h);
     float armor_Point(RotatedRect left_light, float _w, float _h);
     float run_SolvePnp(float _W, float _H);
-    void get_angle();
-    void calcu_depth();
+    float get_angle();
+    float calcu_depth();
     //小孔成像
     float Pinhole_imaging(RotatedRect rects, float _h);
+    Mat camera_ptz(Mat & t);
 
     Point armor_point;
     vector<Point2f> target2d;
@@ -37,4 +38,7 @@ public:
     int theta_x;
     int theta_y;
     int theta_z;
+    const float ptz_camera_x = 0;
+    const float ptz_camera_y = 0;
+    const float ptz_camera_z = 0;
 };

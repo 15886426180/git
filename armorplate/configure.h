@@ -1,4 +1,4 @@
-#include "control.h"
+﻿#include "control.h"
 #include "CameraApi.h"
 /*---工业相机中使用到opencv2.0的 IplImage 需要包含此头文件 ---*/
 #include "opencv2/imgproc/imgproc_c.h"
