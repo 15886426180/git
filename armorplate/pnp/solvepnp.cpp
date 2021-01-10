@@ -166,6 +166,6 @@ Mat SolveP4p::camera_ptz(Mat & t)
     Mat t_camera_ptz(3,1,CV_64FC1,t_data);
 
     Mat position_in_ptz = r_camera_ptz * t - t_camera_ptz;
-    cout << position_in_ptz << endl;
+    // cout << position_in_ptz << endl;
     return position_in_ptz;
 }

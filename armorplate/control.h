@@ -1,7 +1,7 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-#define USB_CAPTURE_DEFULT 0
+#define USB_CAPTURE_DEFULT "/home/sms/tu/rm1/armor_2.avi"
 /**
   @brief: 相机的默认值
   @note: 使用普通USB相机时，Opencv的VideoCapture接口的值
@@ -25,21 +25,21 @@
  * @param 0 不截取 
  * 有问题还没改好
  */
-#define FPS_SHOW 0
+#define FPS_SHOW 1
 /**
  * @brief 是否显示帧数
  * @param 1 显示
  * @param 0 不显示
  */
 
-#define DRAW_LIGHT_IMG 1
+#define DRAW_LIGHT_IMG 0
 /**
  * @brief 是否绘制灯条
  * @param 1 绘制
  * @param 0 不绘制
  */
 
-#define DRAW_ARMOR_IMG 1
+#define DRAW_ARMOR_IMG 0
 /**
  * @brief 是否绘制装甲板在图像上
  * @param 1 绘制
@@ -122,7 +122,7 @@
 /*---------------------------------------------------*/
 
 #if ISOPEN_INDUSTRY_CAPTURE == 1
-#define CAMERA_PARAM_FILE "/home/xx/github/armorplate/cameraParams.xml"
+#define CAMERA_PARAM_FILE "/home/sms/桌面/git-master (4)/git-master/armorplate/camera.xml"
 
 #elif ISOPEN_INDUSTRY_CAPTURE == 0
 #define CAMERA_PARAM_FILE "/home/sms/桌面/git-master (4)/git-master/armorplate/camera.xml"
@@ -149,7 +149,7 @@
  */
 
 #define ANTI_RANGE 1.01//指数增长的底数
-#define ACC 0.000001f/
+#define ACC 0.000001f
 #define MNC 0.0000000001f//测量协方差矩阵R，更大会有更慢的回归
 #define DEAD_BAND 0
 #define SIZE_X 960

@@ -15,10 +15,9 @@ float Distance(Point a, Point b)
 
 void ArmorPlate::eliminate()
 {
+    this->success_armor = false;
     this->draw_img = Mat::zeros(Size(CAMERA_RESOLUTION_COLS, CAMERA_RESOLUTION_ROWS), CV_8UC3);
     this->rect_num = 0;
-    this->lost_success_armor = this->success_armor; //保存上一帧的参数
-    this->success_armor = false;
 #if ROI_IMG == 1
     if (this->armor_roi.x + this->armor_roi.width > IMG_COLS || this->armor_roi.y + this->armor_roi.height > IMG_ROWS)
     {
@@ -233,15 +232,20 @@ bool LightBar::light_judge(int i, int j)
         {
             //装甲板长宽比
             float w_max = light[j].center.x - light[i].center.x;   
-            if (w_max < h_max * 2.45 && w_max > h_max * 0.5f)
+            if (w_max < h_max * 2.45&& w_max > h_max * 0.5f)
             {
+                /*change place*/
+                char_armor=1;
+                /*************/
                 return true;
      
             }
 
-            if (w_max > h_max * 3.05f && w_max < h_max * 4.6f )
+            if (w_max > h_max * 3.05f && w_max < h_max * 4.6f &&(light[i].angle-light[j].angle)<1.25f)
             {
-                
+                /*change place*/
+                char_armor=2;
+                /*************/
                 return true; 
             }
         }
@@ -279,10 +283,23 @@ Mat LightBar::armor_rect(int i, int j, Mat src_img, float angle)
     this->armor.push_back(rects); //储存装甲板旋转矩形
     Rect _rect = rects.boundingRect();
     Mat roi;
-    if (_rect.y > 0 && _rect.y + _rect.height < 480)
+    if (_rect.y + _rect.height > src_img.rows)
     {
-        roi = src_img(_rect);
+        _rect.height = src_img.rows - _rect.y;
     }
+    if(_rect.x+_rect.width>src_img.cols)
+    {
+        _rect.width = src_img.cols - _rect.x;
+    }
+    if(_rect.x<0)
+    {
+        _rect.x = 0;
+    }
+    if(_rect.y<0)
+    {
+        _rect.y = 0;
+    }
+    roi = src_img(_rect);
     return roi;
 }
 
@@ -299,7 +316,7 @@ int LightBar::optimal_armor()
     for (size_t i = 0; i < this->light_subscript.size(); i += 2)
     {
             //灯条是“\\”或者“//”和“||”这样
-            if (fabs(this->light[this->light_subscript[i]].angle - this->light[this->light_subscript[i + 1]].angle) < 5.0f)
+            if (fabs(this->light[this->light_subscript[i]].angle - this->light[this->light_subscript[i + 1]].angle) < 3.0f)
             {
                 this->priority.push_back(true);
             }
@@ -324,7 +341,7 @@ int LightBar::optimal_armor()
             this->priority.push_back(true);
         }
 
-        //灯条中心点形成的直线与水平线的夹角
+        //灯条中心点形成的直线与水平线的夹角f
         float delta_y = this->light[this->light_subscript[i]].center.y - this->light[this->light_subscript[i + 1]].center.y;
         float delta_x = this->light[this->light_subscript[i]].center.x - this->light[this->light_subscript[i + 1]].center.x;
         float deviationAngle = abs(atan(delta_y / delta_x)) * 180 / CV_PI;
@@ -333,11 +350,22 @@ int LightBar::optimal_armor()
             this->priority.push_back(true);
         }
 
-        //灯条的中心店到装甲板中心点的距离超过最小灯条的宽度
+        //灯条的中心点到装甲板中心点的距离超过最小灯条的宽度
         if (Distance(this->armor[i / 2].center, this->light[this->light_subscript[i]].center) > h_/2 && Distance(this->armor[i / 2].center, this->light[this->light_subscript[i + 1]].center) > h_/2)
         {
             this->priority.push_back(true);
         }
+
+        if(this->armor[i/2].size.width / this->armor[i/2].size.height < 2)
+        {
+            this->priority.push_back(true);
+        }
+        else if(this->armor[i/2].size.width / this->armor[i/2].size.height > 4)
+        {
+            continue;
+        }
+        
+
         if (this->priority.size() > 2)
         {
             if (this->priority.size() > max)
@@ -348,12 +376,23 @@ int LightBar::optimal_armor()
             else if (this->priority.size() == max)
             {
                 //符合程度相同时选取更近的一位
-                int this_wamx = Distance(this->light[this->light_subscript[i]].center , this->light[this->light_subscript[i + 1]].center);
-                int max_wmax = Distance(this->light[this->light_subscript[max_num]].center , this->light[this->light_subscript[max_num + 1]].center);
-                if (this_wamx > max_wmax)
+                // int this_wamh = Distance(this->light[this->light_subscript[i]].center , this->light[this->light_subscript[i + 1]].center);
+                // int max_wmah = Distance(this->light[this->light_subscript[max_num]].center , this->light[this->light_subscript[max_num + 1]].center);
+                int this_wamh = this->light[light_subscript[i]].size.height;
+                int max_wmah = this->light[light_subscript[max_num]].size.height;
+                if(this->armor[i/2].size.width / this->armor[i/2].size.height < 2)
                 {
                     max_num = i;
                 }
+                else
+                {
+                    if (this_wamh > max_wmah)
+                    {
+                        max_num = i;
+                    }
+                }
+                
+                
             }
         }
         this->priority.clear();
@@ -370,6 +409,7 @@ void LightBar::eliminate()
     light.clear();
     armor.clear();
     light_subscript.clear();
+    priority.clear();
 }
 
 /**

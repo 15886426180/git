@@ -38,7 +38,7 @@ Point2f RM_kalmanfilter::point_Predict(double init_runtime, Point2d current_poin
 {
     runtime = init_runtime;
     double v = (current_point.x - last_point.x) / runtime;
-    double a = (v - last_v) / runtime;
+    double acc = (v - last_v) / runtime;
 
     #if COUT_STATE == 1
     cout<<"["<<runtime<<","<<v<<","<<a<<"]"<<endl;
@@ -46,7 +46,7 @@ Point2f RM_kalmanfilter::point_Predict(double init_runtime, Point2d current_poin
 
     measurement_img.at < double > (0, 0) = current_point.x;
     measurement_img.at < double > (1, 0) = v;
-    measurement_img.at < double > (2, 0) = a;
+    measurement_img.at < double > (2, 0) = acc;
 
     Mat prediction2 = kalman_img.predict(); //至此完成了对下一帧单纯计算的预测，得出的点更加平稳。如果保证测量值够准，可以直接取这里算出的点
     Mat prediction = kalman_img.correct(measurement_img); //至此完成了对下一帧的最优估计，得出的点理论上更接近真实值。同时用于迭代，得出statePost供下一帧predict计算
@@ -55,7 +55,8 @@ Point2f RM_kalmanfilter::point_Predict(double init_runtime, Point2d current_poin
     double temp_x = current_point.x + pow(ANTI_RANGE,n*0.8) * (current_point.x - temp_point.x);
     Point2f anti_kalman_point;
 
-    if(a<-ACC||a>ACC){
+    if(acc<-ACC||acc>ACC)
+    {
         n++;
     }
     else{n=2;}
@@ -84,9 +85,9 @@ Point2f RM_kalmanfilter::point_Predict(double init_runtime, Point2d current_poin
 
     last_v = v;
     last_point = current_point;
-#ifdef PID
-    anti_kalman_point = pid_Control_predictor(anti_kalman_point,current_point);
-#endif
+// #ifdef PID
+//     anti_kalman_point = pid_Control_predictor(anti_kalman_point,current_point);
+// #endif
     return anti_kalman_point;
 }
 //
@@ -96,71 +97,72 @@ float RM_kalmanfilter::point_dis(Point p1, Point p2)
     return D;
 }
 
-Point RM_kalmanfilter::pid_Control_predictor(Point predict, Point local)
-{
-    cv::Point true_location;  // 返回的坐标点，后续可能会改成角度，暂留
 
-    int error_x;  // x坐标之间的差值
-    int error_y;  // y坐标之间的差值
-    int dis;
+// Point RM_kalmanfilter::pid_Control_predictor(Point predict, Point local)
+// {
+//     cv::Point true_location;  // 返回的坐标点，后续可能会改成角度，暂留
 
-    predict_x = predict.x;  /*预测位置*/
-    predict_y = predict.y;
+//     int error_x;  // x坐标之间的差值
+//     int error_y;  // y坐标之间的差值
+//     int dis;
 
-    last_x = local.x;  /*上一次的实际位置*/
-    last_y = local.y;
+//     predict_x = predict.x;  /*预测位置*/
+//     predict_y = predict.y;
 
-    error_x = abs(predict_x - last_x);
-    error_y = abs(predict_y - last_y);
+//     last_x = local.x;  /*上一次的实际位置*/
+//     last_y = local.y;
 
-    dis = point_dis(predict, local);
+//     error_x = abs(predict_x - last_x);
+//     error_y = abs(predict_y - last_y);
 
-
-    if(dis < 3)
-    { // 差值过小的不进入PID处理
-        true_location.x = last_x;  // 差值过小就不用预测位，防止云台抖动
-        true_location.y = last_y;
-    }
+//     dis = point_dis(predict, local);
 
 
-    if(dis > 5 && dis < 10)
-    {  // 合理范围内就用预测点，具体参数要依实际调整
-        true_location.x = predict_x;
-        true_location.y = predict_y;
-    }
+//     if(dis < 3)
+//     { // 差值过小的不进入PID处理
+//         true_location.x = last_x;  // 差值过小就不用预测位，防止云台抖动
+//         true_location.y = last_y;
+//     }
 
 
-    if(dis > 10)  // 依实际调整
-    {
-        // 调用PID //
-        error_x = error_x*KP + error_x*KI + error_x*KD;  // PID修正误差
-        error_y = error_y*KP + error_y*KI + error_y*KD;
+//     if(dis > 5 && dis < 10)
+//     {  // 合理范围内就用预测点，具体参数要依实际调整
+//         true_location.x = predict_x;
+//         true_location.y = predict_y;
+//     }
 
-        /*下面有四种情况，直接看代码理解会比较好，注意图像坐标是左上角为0点*/
-        if(predict_x >= last_x && predict_y >= last_y)
-        {
-            true_location.x = last_x + error_x;
-            true_location.y = last_y + error_y;
-        }
-        else if (predict_x >= last_x && predict_y <= last_y)
-        {
-            true_location.x = last_x + error_x;
-            true_location.y = last_y - error_y;
-        }
-        else if (predict_x <= last_x && predict_y <= last_y)
-        {
-            true_location.x = last_x - error_x;
-            true_location.y = last_y - error_y;
-        }
-        else if (predict_x <= last_x && predict_y >= last_y)
-        {
-            true_location.x = last_x - error_x;
-            true_location.y = last_y + error_y;
-        }
-        else {
 
-        }
+//     if(dis > 10)  // 依实际调整
+//     {
+//         // 调用PID //
+//         error_x = error_x*KP + error_x*KI + error_x*KD;  // PID修正误差
+//         error_y = error_y*KP + error_y*KI + error_y*KD;
 
-     }
-    return true_location;  // 返回最终修复的坐标
-}
+//         /*下面有四种情况，直接看代码理解会比较好，注意图像坐标是左上角为0点*/
+//         if(predict_x >= last_x && predict_y >= last_y)
+//         {
+//             true_location.x = last_x + error_x;
+//             true_location.y = last_y + error_y;
+//         }
+//         else if (predict_x >= last_x && predict_y <= last_y)
+//         {
+//             true_location.x = last_x + error_x;
+//             true_location.y = last_y - error_y;
+//         }
+//         else if (predict_x <= last_x && predict_y <= last_y)
+//         {
+//             true_location.x = last_x - error_x;
+//             true_location.y = last_y - error_y;
+//         }
+//         else if (predict_x <= last_x && predict_y >= last_y)
+//         {
+//             true_location.x = last_x - error_x;
+//             true_location.y = last_y + error_y;
+//         }
+//         else {
+
+//         }
+
+//      }
+//     return true_location;  // 返回最终修复的坐标
+// }

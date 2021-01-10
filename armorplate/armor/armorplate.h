@@ -13,10 +13,13 @@ class ArmorPlate
 public:
     Mat draw_img = Mat::zeros(Size(CAMERA_RESOLUTION_COLS, CAMERA_RESOLUTION_ROWS), CV_8UC3);
     int rect_num = 0;
-    int lost = 0;
+    int lost = 0;//丢失帧数
     Rect armor_roi;
-    bool lost_success_armor = false;
-    bool success_armor = false;
+    bool lost_success_armor = false;//上一帧是否找到装甲板
+    bool success_armor = false;//这一帧是否找到装甲板
+    /*change place */
+    int char_armor=0;//判断打击装甲板的种类
+    /*********/
     void eliminate();
     void run();
     ArmorPlate() {}
@@ -27,7 +30,7 @@ public:
  * @brief 识别灯条
  * 
  */
-class LightBar
+class LightBar:public ArmorPlate
 {
 public:
     vector<RotatedRect> light;       //储存灯条的旋转矩形
@@ -37,6 +40,7 @@ public:
     vector<bool> priority;           //优先级
     float light_aspect_ratio = 0.6f; //灯条长宽比
     float light_angle = 60.0;        //灯条角度
+    RotatedRect lost_armor;          //上一帧装甲板位置
     bool armor_fitting(Mat src_img);
     bool light_judge(int i, int j);
     bool find_light(Mat mask);
@@ -69,6 +73,6 @@ public:
     int blue_armor_gray_th = 50;
     int blue_armor_color_th = 21;
     //红色th参数
-    int red_armor_gray_th = 47; //视频20
-    int red_armor_color_th = 66;
+    int red_armor_gray_th = 20; //视频20
+    int red_armor_color_th = 39;
 };

@@ -4,7 +4,7 @@
 #include "pnp/solvepnp.h"
 #include "serial/serialport.h"
 #include "camera/videocapture.h"
-
+#include "kalmantest/kalmantest.h"
 class WorKing
 {
 public:
@@ -18,6 +18,6 @@ public:
     SolveP4p pnp;
     cv::VideoCapture capture;
     VideoCap cap;
-
+    RM_kalmanfilter kalman;
     Mat frame;
 };
