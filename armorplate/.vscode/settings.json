@@ -4,6 +4,14 @@
         "ostream": "cpp",
         "iostream": "cpp",
         "cmath": "cpp",
-        "complex": "cpp"
+        "complex": "cpp",
+        "array": "cpp",
+        "*.tcc": "cpp",
+        "memory": "cpp",
+        "istream": "cpp",
+        "functional": "cpp",
+        "tuple": "cpp",
+        "utility": "cpp",
+        "fstream": "cpp"
     }
 }
