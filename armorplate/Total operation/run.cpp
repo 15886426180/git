@@ -8,6 +8,7 @@ WorKing::WorKing() : capture(USB_CAPTURE_DEFULT), cap(ISOPEN_INDUSTRY_CAPTURE) {
  */
 void WorKing::Run()
 {
+                     
     for (;;)
     {
 // #if FPS_IMSHOW == 1
@@ -21,6 +22,7 @@ void WorKing::Run()
         {
             capture >> frame;
         }
+
 
         // armor.success_armor = false;
         Mat src_img, roi_img;
@@ -185,7 +187,7 @@ void WorKing::Run()
         int fps = int(1.0 / t);                                        //转换为帧率
         cout << "FPS: " << fps << endl;                                //输出帧率
 //#endif
-        Point ddd = kalman.point_Predict(50, Point(armor.armor_roi.x+(armor.armor_roi.width/2),armor.armor_roi.y+(armor.armor_roi.height/2) ));
+        Point ddd = kalman.point_Predict(1/t, Point(armor.armor_roi.x+(armor.armor_roi.width/2),armor.armor_roi.y+(armor.armor_roi.height/2) ));
         circle(src_img, ddd, 3, Scalar(0, 255, 255), 3, 8);
         imshow("frame", src_img);
         cap.cameraReleasebuff();
@@ -201,12 +203,40 @@ WorKing::~WorKing() {}
 
 void WorKing::ddd()
 {
+    cv::Size size(/*(int)frameWidth, (int)frameHeight*/640,480);
+    // int fourcc = recorder.fourcc('M', 'J', 'P', 'G');   // 设置avi文件对应的编码格式
+    // VideoWriter recorder("/home/sms/视频/2021-1-10 21:28.avi", ('M', 'J', 'P', 'G'), 30, size);
+           /*视频录制*/
+            //--- INITIALIZE VIDEOWRITER
+    bool isColor = (frame.type() == CV_8UC3);
+    VideoWriter writer;
+    int codec = VideoWriter::fourcc('M', 'J', 'P', 'G');  // select desired codec (must be available at runtime)
+    double fps = 25.0;                          // framerate of the created video stream
+    string filename = "/home/sms/视频/20210-1-11.avi";             // name of the output video file
+    writer.open(filename, codec, fps, frame.size(), isColor);
+    // check if we succeeded
+    if (!writer.isOpened())
+
+     {
+        cout << "Could not open the output video file for write\n";
+    }
+    //--- GRAB AND WRITE LOOP
+    cout << "Writing videofile: " << filename << endl
+         << "Press any key to terminate" << endl;
+        /**************/
     for (;;)
     {
+
+
         if (cap.isindustryimgInput())
         {
             frame = cvarrToMat(cap.iplImage, true);
         }
+        // encode the frame into the videofile stream
+        // show live and wait for a key with timeout long enough to show images
+        writer.write(frame);
+        // imshow("Live", frame);
+
         imshow("frame", frame);
         cap.cameraReleasebuff();
         char c = waitKey(1);
