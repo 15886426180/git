@@ -1,0 +1,55 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+        "tasks": [
+            {
+                "type": "shell",
+                "label": "build",
+                "command": "g++",
+                "args": [
+                    "-std=c++11",
+                    "-static-libgcc", // 静态链接
+                    "-Wall", // 开启额外警告
+                    //include Path
+                    "-I","${workspaceFolder}/",
+                    "-I","${workspaceFolder}/armor/",
+                    "-I","${workspaceFolder}/camera/",
+                    "-I","${workspaceFolder}/control/",
+                    "-I","${workspaceFolder}/filter/",
+                    "-I","${workspaceFolder}/serial/",
+                    "-I","${workspaceFolder}/solve_PNP/",
+                    "-I","${workspaceFolder}/vedio/",
+                    "-I","/usr/local/include/",
+                    "-I","/usr/local/include/opencv4/",
+                    "-I","/usr/local/include/opencv4/opencv2/",
+                    //sources files Path
+                    "-g",
+                    "${workspaceFolder}/armor/rm_armorfitted.cpp",
+                    "${workspaceFolder}/filter/rm_kalmanfilter.cpp",
+                    "${workspaceFolder}/camera/rm_videocapture.cpp",
+                    "${workspaceFolder}/control/rm_link.cpp",
+                    "${workspaceFolder}/serial/serialport.cpp",
+                    "${workspaceFolder}/solve_PNP/solve_pnp.cpp",
+                    "${workspaceFolder}/main.cpp",
+                    "-o", 
+                    "${workspaceFolder}/run.o",//输出的文件名称以及路径
+                    //lib
+                    "/usr/local/lib/libopencv_*",
+                    "/lib/libMVSDK.so",
+                    //"`pkg-config --cflags --libs protobuf`",
+                    "`pkg-config","--cflags","--libs","protobuf`",
+                ],
+                "options": {
+                    "cwd": "/usr/bin"
+                },
+                "problemMatcher": [
+                    "$gcc"
+                ],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                }
+            }
+        ]
+}
