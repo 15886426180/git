@@ -1,13 +1,30 @@
 #ifndef CONTROL_H
 #define CONTROL_H
-
-#define USB_CAPTURE_DEFULT "/home/sms/tu/rm1/armor_2.avi"
+#define CALL_SERIALPORT 0
+/**
+ * @brief 打开串口传输
+ * @param: 0   不使用
+ * @param: 1   使用
+ */
+#define CALL_KALMAN 0
+/**
+ * @brief 是否调用卡尔曼
+ * @param: 1 调用
+ * @param: 0 不调用
+ */
+#define CALL_DEPTH_INFORMATION 0
+/**
+ * @brief 是否调用深度信息
+ * @param: 1 调用
+ * @param: 0 不调用
+ */
+#define USB_CAPTURE_DEFULT "/home/xx/下载/视频/效果图/armor_3.avi"
 /**
   @brief: 相机的默认值
   @note: 使用普通USB相机时，Opencv的VideoCapture接口的值
 */
 
-#define ISOPEN_INDUSTRY_CAPTURE 0
+#define ISOPEN_INDUSTRY_CAPTURE 1
 /**
   @brief: 是否使用工业相机
   @param: 0     使用工业相机
@@ -23,7 +40,6 @@
  * @brief 打开ROI截取
  * @param 1 截取
  * @param 0 不截取 
- * 有问题还没改好
  */
 #define FPS_SHOW 1
 /**
@@ -105,11 +121,14 @@
  * @brief 灯条实际宽度(mm)
  * 
  */
-#define CAMERA_EXPOSURETIME 300
+#define CAMERA_EXPOSURETIME 25000
 #define CAMERA_RESOLUTION_COLS 1280
 #define CAMERA_RESOLUTION_ROWS 800
 #define CAMERA_RESOLUTION_COLS_FOV ((1280 - CAMERA_RESOLUTION_COLS) * 0.5)
 #define CAMERA_RESOLUTION_ROWS_FOV ((1024 - CAMERA_RESOLUTION_ROWS) * 0.5)
+#define CAMERA_RED_GAIN 150
+#define CAMERA_GREEN_GAIN 114
+#define CAMERA_BLUE_GAIN 84
 /**
   @brief: 设置相机的分辨率
   @param: CAMERA_EXPOSURETIME   相机曝光时间
@@ -122,11 +141,10 @@
 /*---------------------------------------------------*/
 
 #if ISOPEN_INDUSTRY_CAPTURE == 1
-#define CAMERA_PARAM_FILE "/home/sms/桌面/git-master (4)/git-master/armorplate/camera.xml"
+#define CAMERA_PARAM_FILE "/home/xx/RoboMaster-2021-vision-code/src/cameraParams.xml"
 
 #elif ISOPEN_INDUSTRY_CAPTURE == 0
-#define CAMERA_PARAM_FILE "/home/xx/github/armorplate/camera.xml"
-
+#define CAMERA_PARAM_FILE "/home/xx/RoboMaster-2021-vision-code/src/camera.xml"
 #endif
 /**
  * @brief 相机标定文件位置

@@ -53,7 +53,7 @@ void ImageProcess::pretreat(Mat src_img, int enemy_color)
         createTrackbar("COLOR_TH_BLUE:", "src_img", &this->blue_armor_color_th, 255, NULL);
         threshold(gray_img, bin_img_gray, this->blue_armor_gray_th, 255, THRESH_BINARY);
         threshold(bin_img_color, bin_img_color, this->blue_armor_color_th, 255, THRESH_BINARY);
-#elif IS_PARAM_ADJUSTMENT == 0
+#else
         threshold(gray_img, bin_img_gray, blue_armor_gray_th, 255, THRESH_BINARY);
         threshold(bin_img_color, bin_img_color, blue_armor_color_th, 255, THRESH_BINARY);
 #endif
@@ -66,20 +66,25 @@ void ImageProcess::pretreat(Mat src_img, int enemy_color)
         createTrackbar("COLOR_TH_RED:", "src_img", &this->red_armor_color_th, 255);
         threshold(gray_img, bin_img_gray, this->red_armor_gray_th, 255, THRESH_BINARY);
         threshold(bin_img_color, bin_img_color, this->red_armor_color_th, 255, THRESH_BINARY);
-#elif IS_PARAM_ADJUSTMENT == 0
+#else
         threshold(gray_img, bin_img_gray, red_armor_gray_th, 255, THRESH_BINARY);
         threshold(bin_img_color, bin_img_color, red_armor_color_th, 255, THRESH_BINARY);
 #endif
     }
-    Mat element = getStructuringElement(MORPH_ELLIPSE, cv::Size(7, 11));
+    Mat element = getStructuringElement(MORPH_ELLIPSE, cv::Size(3, 7));
 #if SHOW_BIN_IMG == 1
     imshow("gray_img", bin_img_gray);
     imshow("mask", bin_img_color);
 #endif
-    bitwise_and(bin_img_color, bin_img_gray, bin_img_color);
-    // medianBlur(bin_img_color, bin_img_color, 5);
-    dilate(bin_img_color, bin_img_color, element);
 
+    // bitwise_and(bin_img_color, bin_img_gray, bin_img_color);
+    // medianBlur(bin_img_color, bin_img_color, 5);
+    // dilate(bin_img_color, bin_img_color, element);
+
+    dilate(bin_img_gray, bin_img_gray, element);
+    medianBlur(bin_img_color, bin_img_color, 5);
+    dilate(bin_img_color, bin_img_color, element);
+    bitwise_and(bin_img_color, bin_img_gray, bin_img_color);
 #if SHOW_BIN_IMG == 1
     imshow("src_img", bin_img_color);
 #endif
@@ -315,15 +320,15 @@ int LightBar::optimal_armor()
     if(this->armor.size()<=1)return 0;
     for (size_t i = 0; i < this->light_subscript.size(); i += 2)
     {
-            //灯条是“\\”或者“//”和“||”这样
-            if (fabs(this->light[this->light_subscript[i]].angle - this->light[this->light_subscript[i + 1]].angle) < 3.0f)
-            {
-                this->priority.push_back(true);
-            }
-            else
-            {
-                continue;
-            }
+        //灯条是“\\”或者“//”和“||”这样
+        if (fabs(this->light[this->light_subscript[i]].angle - this->light[this->light_subscript[i + 1]].angle) < 3.0f)
+        {
+            this->priority.push_back(true);
+        }
+        else
+        {
+            continue;
+        }
 
         //灯条的高度差不超过最大灯条高度的四分之一
         int left_h = MAX(this->light[this->light_subscript[i]].size.width, this->light[this->light_subscript[i]].size.height);

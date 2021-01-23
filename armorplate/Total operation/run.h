@@ -15,6 +15,9 @@ public:
     ArmorPlate armor;
     LightBar rgb;
     ImageProcess img;
+#if CALL_SERIALPORT == 1
+    SerialPort serial;
+#endif
     SolveP4p pnp;
     cv::VideoCapture capture;
     VideoCap cap;

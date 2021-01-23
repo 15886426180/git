@@ -14,6 +14,13 @@ public:
     Mat draw_img = Mat::zeros(Size(CAMERA_RESOLUTION_COLS, CAMERA_RESOLUTION_ROWS), CV_8UC3);
     int rect_num = 0;
     int lost = 0; //丢失帧数
+    int _yaw = 0;
+    int yaw = 0;
+    int pitch = 0;
+    int _pitch = 0;
+    int depth = 0;
+    int data_type = 0;
+    int is_shooting = 0;
     Rect armor_roi;
     bool lost_success_armor = false; //上一帧是否找到装甲板
     bool success_armor = false;      //这一帧是否找到装甲板

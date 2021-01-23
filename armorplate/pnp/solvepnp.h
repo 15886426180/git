@@ -17,7 +17,7 @@ public:
     ~SolveP4p() {}
 
     //坐标赋值
-    float arrange_Point(RotatedRect rects, float _w, float _h);
+    float arrange_Point(RotatedRect light_left, RotatedRect light_right, float _w, float _h);
     float armor_Point(RotatedRect left_light, float _w, float _h);
     float run_SolvePnp(float _W, float _H);
     float get_angle();
