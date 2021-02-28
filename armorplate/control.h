@@ -1,5 +1,10 @@
 #ifndef CONTROL_H
 #define CONTROL_H
+#define ARC_ANGLE 57.29578
+/**
+ * @brief 弧度转角度
+ * 
+ */
 #define CALL_SERIALPORT 0
 /**
  * @brief 打开串口传输
@@ -18,7 +23,7 @@
  * @param: 1 调用
  * @param: 0 不调用
  */
-#define USB_CAPTURE_DEFULT "/home/xx/下载/视频/效果图/armor_3.avi"
+#define USB_CAPTURE_DEFULT "/home/xx/下载/视频/效果图/camera_MaxBuff12.avi"
 /**
   @brief: 相机的默认值
   @note: 使用普通USB相机时，Opencv的VideoCapture接口的值
@@ -41,7 +46,7 @@
  * @param 1 截取
  * @param 0 不截取 
  */
-#define FPS_SHOW 1
+#define FPS_SHOW 0
 /**
  * @brief 是否显示帧数
  * @param 1 显示
@@ -69,7 +74,7 @@
  * @param 0 不显示
  */
 
-#define COLOR 1
+#define COLOR 0
 /**
  * @brief 敌方颜色
  * @param 1 红色
@@ -121,14 +126,14 @@
  * @brief 灯条实际宽度(mm)
  * 
  */
-#define CAMERA_EXPOSURETIME 25000
+#define CAMERA_EXPOSURETIME 1200
 #define CAMERA_RESOLUTION_COLS 1280
 #define CAMERA_RESOLUTION_ROWS 800
 #define CAMERA_RESOLUTION_COLS_FOV ((1280 - CAMERA_RESOLUTION_COLS) * 0.5)
 #define CAMERA_RESOLUTION_ROWS_FOV ((1024 - CAMERA_RESOLUTION_ROWS) * 0.5)
-#define CAMERA_RED_GAIN 150
-#define CAMERA_GREEN_GAIN 114
-#define CAMERA_BLUE_GAIN 84
+#define CAMERA_RED_GAIN 100
+#define CAMERA_GREEN_GAIN 100
+#define CAMERA_BLUE_GAIN 100
 /**
   @brief: 设置相机的分辨率
   @param: CAMERA_EXPOSURETIME   相机曝光时间
@@ -165,6 +170,9 @@
  * @brief 相机高度
  * 
  */
+
+#define MAX_BUFF_WIDTH 300
+#define MAX_BUFF_HEIGHT 170
 
 #define ANTI_RANGE 1.01 //指数增长的底数
 #define ACC 0.000001f

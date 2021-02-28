@@ -5,16 +5,19 @@
 #include "serial/serialport.h"
 #include "camera/videocapture.h"
 #include "kalmantest/kalmantest.h"
+#include "detect_buff/buff_detect.h"
 class WorKing
 {
 public:
     WorKing();
     ~WorKing();
-    void Run();
-    void ddd();
+    void Run();              //装甲板
+    void ddd();              //拍摄图片
+    void Run_MAX_Talisman(); //大神符
     ArmorPlate armor;
     LightBar rgb;
     ImageProcess img;
+    Max_Buff buff;
 #if CALL_SERIALPORT == 1
     SerialPort serial;
 #endif

@@ -18,6 +18,7 @@
 			"-I","${workspaceFolder}/camera/",
 			"-I","${workspaceFolder}/kalmantest/",
 			"-I","${workspaceFolder}/Total operation/",
+			"-I","${workspaceFolder}/detect_buff/",
 			"-I","/usr/local/include/",
 			"-I","/usr/local/include/opencv4/",
 			"-I","/usr/local/include/opencv4/opencv2/",
@@ -29,6 +30,7 @@
 			"${workspaceFolder}/serial/serialport.cpp",
 			"${workspaceFolder}/Total operation/run.cpp",
 			"${workspaceFolder}/camera/videocapture.cpp",
+			"${workspaceFolder}/detect_buff/buff_detect.cpp",
 			"${workspaceFolder}/main.cpp",/* ${workspaceFolder}表⽰路径从当前项⽬⽂件夹开始 */
 			"-o", /* 编译输出⽂件的存放路径 */
 			"${workspaceFolder}/run.o", /* 要与launch.json⽂件⾥的program的内容保持⼀致 */

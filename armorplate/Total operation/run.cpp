@@ -11,7 +11,7 @@ void WorKing::Run()
 
     for (;;)
     {
-#if FPS_IMSHOW == 1
+#if FPS_SHOW == 1
         double t = (double)cv::getTickCount(); //开始计时
 #endif                                         // #endif
         if (cap.isindustryimgInput())
@@ -145,7 +145,7 @@ void WorKing::Run()
 
         rgb.eliminate();
         armor.eliminate();
-#if FPS_IMSHOW == 1
+#if FPS_SHOW == 1
         t = ((double)cv::getTickCount() - t) / cv::getTickFrequency(); //结束计时
         int fps = int(1.0 / t);                                        //转换为帧率
         cout << "FPS: " << fps << endl;                                //输出帧率
@@ -157,7 +157,7 @@ void WorKing::Run()
         imshow("frame", src_img);
         // serial.RMserialWrite();
         cap.cameraReleasebuff();
-        char c = waitKey(300);
+        char c = waitKey(1);
         if (c == 27) //"Esc"-退出
         {
             break;
@@ -201,5 +201,42 @@ void WorKing::ddd()
         cap.cameraReleasebuff();
         cout << "第" << n << "张" << endl;
         // waitKey(2000);
+    }
+}
+
+void WorKing::Run_MAX_Talisman()
+{
+    for (;;)
+    {
+#if FPS_SHOW == 1
+        double t = (double)cv::getTickCount(); //开始计时
+#endif                                         // #endif
+        if (cap.isindustryimgInput())
+        {
+            frame = cvarrToMat(cap.iplImage, true);
+        }
+        else
+        {
+            capture >> frame;
+        }
+        // resize(frame, frame, Size(640, 400));
+        buff.pretreat(frame, COLOR);
+        buff.Looking_for_center();
+        imshow("frame", frame);
+
+        buff.armor_center.clear();
+        buff.max_buff_rects.clear();
+        cout << pnp.max_buff_Point(buff.max_buff_rects[buff.hit_subscript]) << endl;
+        
+#if FPS_SHOW == 1
+        t = ((double)cv::getTickCount() - t) / cv::getTickFrequency(); //结束计时
+        int fps = int(1.0 / t);                                        //转换为帧率
+        cout << "FPS: " << fps << endl;                                //输出帧率
+#endif
+        char c = waitKey(100);
+        if (c == 27) //"Esc"-退出
+        {
+            break;
+        }
     }
 }

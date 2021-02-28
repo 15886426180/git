@@ -22,9 +22,10 @@ public:
     float run_SolvePnp(float _W, float _H);
     float get_angle();
     float calcu_depth();
+    float max_buff_Point(RotatedRect rects);
     //小孔成像
     float Pinhole_imaging(RotatedRect rects, float _h);
-    Mat camera_ptz(Mat & t);
+    Mat camera_ptz(Mat &t);
 
     Point armor_point;
     vector<Point2f> target2d;

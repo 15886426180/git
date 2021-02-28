@@ -1,8 +1,5 @@
 #include "solvepnp.h"
 
-//下次修改内容
-//70行增加辅助拟合曲线
-
 /**
  * @brief 装甲板二维点
  * 
@@ -50,8 +47,8 @@ float SolveP4p::run_SolvePnp(float _W, float _H)
     object_3d.push_back(Point3f(-half_x, half_y, 0));
 
     solvePnP(this->object_3d, this->target2d, this->cameraMatrix, this->distCoeffs, this->rvec, this->tvec, false, SOLVEPNP_P3P);
-    Mat ptz = camera_ptz(tvec);//云台Pitch轴当前角度
-    return sqrt(pow(ptz.at<double>(0, 2), 2)+ pow(ptz.at<double>(0, 0), 2));
+    Mat ptz = camera_ptz(tvec); //云台Pitch轴当前角度
+    return sqrt(pow(ptz.at<double>(0, 2), 2) + pow(ptz.at<double>(0, 0), 2));
 }
 /**
  * @brief 计算深度信息
@@ -59,21 +56,20 @@ float SolveP4p::run_SolvePnp(float _W, float _H)
  * @param t 传入平移向量
  * @return Mat 返回世界坐标系
  */
-Mat SolveP4p::camera_ptz(Mat & t)
+Mat SolveP4p::camera_ptz(Mat &t)
 {
     //设相机坐r_camera_ptz标系绕X轴你是逆时针旋转θ后与云台坐标系的各个轴向平行
-    double theta = 0;/*-atan(static_cast<double>(ptz_camera_y + barrel_ptz_offset_y))/static_cast<double>(overlap_dist);*/
-    double r_data[] = {1,0,0,0,cos(theta),sin(theta),0,-sin(theta),cos(theta)};
+    double theta = 0; /*-atan(static_cast<double>(ptz_camera_y + barrel_ptz_offset_y))/static_cast<double>(overlap_dist);*/
+    double r_data[] = {1, 0, 0, 0, cos(theta), sin(theta), 0, -sin(theta), cos(theta)};
     //设相机坐标系的原点在云台坐标系中的坐标为(x0,y0,z0)
-    double t_data[] = {static_cast<double>(ptz_camera_x),static_cast<double>(ptz_camera_y),static_cast<double>(ptz_camera_z)};
-    Mat r_camera_ptz(3,3,CV_64FC1,r_data);
-    Mat t_camera_ptz(3,1,CV_64FC1,t_data);
+    double t_data[] = {static_cast<double>(ptz_camera_x), static_cast<double>(ptz_camera_y), static_cast<double>(ptz_camera_z)};
+    Mat r_camera_ptz(3, 3, CV_64FC1, r_data);
+    Mat t_camera_ptz(3, 1, CV_64FC1, t_data);
 
     Mat position_in_ptz = r_camera_ptz * t - t_camera_ptz;
     // cout << position_in_ptz << endl;
     return position_in_ptz;
 }
-
 
 /**
  * @brief 计算旋转角 pitch roll yaw
@@ -81,8 +77,8 @@ Mat SolveP4p::camera_ptz(Mat & t)
  */
 float SolveP4p::get_angle()
 {
-    cout<<this->rotM.at<double>(2, 1);
-    cout<<this->rotM.at<double>(2, 2);
+    cout << this->rotM.at<double>(2, 1);
+    cout << this->rotM.at<double>(2, 2);
     this->theta_x = atan2(this->rotM.at<double>(2, 1), this->rotM.at<double>(2, 2));
     this->theta_y = atan2(-this->rotM.at<double>(2, 0),
                           sqrt(this->rotM.at<double>(2, 1) * this->rotM.at<double>(2, 1) + this->rotM.at<double>(2, 2) * this->rotM.at<double>(2, 2)));
@@ -122,3 +118,12 @@ float SolveP4p::Pinhole_imaging(RotatedRect rects, float _h)
     return dist;
 }
 
+float SolveP4p::max_buff_Point(RotatedRect rects)
+{
+    int _w = MAX(rects.size.width, rects.size.height);
+    int _h = MIN(rects.size.width, rects.size.height);
+
+    float dist_h = MAX_BUFF_HEIGHT * this->cameraMatrix.at<double>(1, 1) / _h;
+    float dist_w = MAX_BUFF_WIDTH * this->cameraMatrix.at<double>(1, 1) / _w;
+    return (dist_h + dist_w) / 2;
+}
