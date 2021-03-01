@@ -53,4 +53,5 @@ public:
     //红色th参数
     int red_armor_gray_th = 70;
     int red_armor_color_th = 15;
+    int _yaw, yaw, _pitch, pitch, depth = 0, data_type, is_shooting;
 };

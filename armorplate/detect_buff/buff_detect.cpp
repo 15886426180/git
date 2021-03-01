@@ -271,15 +271,36 @@ void Max_Buff::Calculating_coordinates(int i)
         calculation_position[0].y = (subs3 + sigma * a1 - sigma * a2) / (2 * subs1);
         calculation_position[1].y = (subs3 - sigma * a1 + sigma * a2) / (2 * subs1);
     }
-    if (direction_tmp_ > 0)
+    if (direction_tmp_ > 0) //顺时针
     {
         circle(frame, calculation_position[1], 10, Scalar(0, 0, 255), -1);
+        pre_center = calculation_position[1];
     }
     else
     {
         circle(frame, calculation_position[0], 10, Scalar(255, 0, 0), -1);
+        pre_center = calculation_position[0];
     }
-
+    if (pre_center.x > (CAMERA_RESOLUTION_COLS / 2))
+    {
+        _yaw = 0;
+    }
+    else
+    {
+        _yaw = 1;
+    }
+    if (pre_center.y > (CAMERA_RESOLUTION_ROWS / 2))
+    {
+        _pitch = 0;
+    }
+    else
+    {
+        _pitch = 1;
+    }
+    pitch = pre_center.y;
+    yaw = pre_center.x;
+    data_type = 1;
+    is_shooting = 1;
     // float radius = sqrt((R_center.x - max_buff_rects[i].center.x) * (R_center.x - max_buff_rects[i].center.x) + (R_center.y - max_buff_rects[i].center.y) * (R_center.y - max_buff_rects[i].center.y));
     // 计算参数方程
     // float a = (max_buff_rects[i].center.x - R_center.x) / radius;

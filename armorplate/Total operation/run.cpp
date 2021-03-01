@@ -226,7 +226,7 @@ void WorKing::Run_MAX_Talisman()
 
         buff.armor_center.clear();
         buff.max_buff_rects.clear();
-
+        serial.RMserialWrite(buff._yaw, buff.yaw, buff._pitch, buff.pitch, buff.depth, buff.data_type, buff.is_shooting);
         // cout << pnp.max_buff_Point(buff.max_buff_rects[buff.hit_subscript]) << endl;
 
 #if FPS_SHOW == 1
