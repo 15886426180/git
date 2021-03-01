@@ -29,7 +29,7 @@
   @note: 使用普通USB相机时，Opencv的VideoCapture接口的值
 */
 
-#define ISOPEN_INDUSTRY_CAPTURE 1
+#define ISOPEN_INDUSTRY_CAPTURE 0
 /**
   @brief: 是否使用工业相机
   @param: 0     使用工业相机
@@ -74,7 +74,7 @@
  * @param 0 不显示
  */
 
-#define COLOR 1
+#define COLOR 0
 /**
  * @brief 敌方颜色
  * @param 1 红色
@@ -126,7 +126,15 @@
  * @brief 灯条实际宽度(mm)
  * 
  */
-#define CAMERA_EXPOSURETIME 1200
+
+#define SET_BANDRATE 115200
+//#define SET_BANDRATE 1500000
+/**
+  @brief: 设置波特率
+  @param: 115200    波特率115200
+  @param: 1500000   波特率1500000
+*/
+#define CAMERA_EXPOSURETIME 2000
 #define CAMERA_RESOLUTION_COLS 1280
 #define CAMERA_RESOLUTION_ROWS 800
 #define CAMERA_RESOLUTION_COLS_FOV ((1280 - CAMERA_RESOLUTION_COLS) * 0.5)
@@ -149,7 +157,7 @@
 #define CAMERA_PARAM_FILE "/home/xx/RoboMaster-2021-vision-code/src/cameraParams.xml"
 
 #elif ISOPEN_INDUSTRY_CAPTURE == 0
-#define CAMERA_PARAM_FILE "/home/xx/RoboMaster-2021-vision-code/src/camera.xml"
+#define CAMERA_PARAM_FILE "/home/gcurobot/armorplate/armorplate/camera.xml"
 #endif
 /**
  * @brief 相机标定文件位置

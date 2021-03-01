@@ -12,7 +12,7 @@ void Max_Buff::pretreat(Mat src_img, int enemy_color)
     this->frame = src_img;
     //转灰度图
     Mat gray_img;
-    blur(src_img, src_img, Size(7, 7));
+    blur(src_img, src_img, Size(5, 5));
     cvtColor(src_img, gray_img, COLOR_BGR2GRAY);
     //分离通道
     vector<Mat> _split;
@@ -52,10 +52,11 @@ void Max_Buff::pretreat(Mat src_img, int enemy_color)
     imshow("gray_img", bin_img_gray);
     imshow("mask", bin_img_color);
 #endif
-    // medianBlur(bin_img_color, bin_img_color, 9);
-    morphologyEx(bin_img_color, bin_img_color, MORPH_OPEN, element);
-    dilate(bin_img_gray, bin_img_gray, dilate_element);
+    medianBlur(bin_img_color, bin_img_color, 3);
+    // morphologyEx(bin_img_color, bin_img_color, MORPH_OPEN, element);
+    dilate(bin_img_color, bin_img_color, dilate_element);
     bitwise_and(bin_img_color, bin_img_gray, bin_img_color);
+    dilate(bin_img_color, bin_img_color, dilate_element);
 #if SHOW_BIN_IMG == 1
     imshow("src_img", bin_img_color);
 #endif
@@ -140,6 +141,7 @@ void Max_Buff::Looking_for_center()
         if (find_cnt_ == 10)
             find_cnt_ = 0;
     }
+    cout<<direction_tmp_<<endl;
     if (R_success)
     {
         if (choice_success)
@@ -276,11 +278,16 @@ void Max_Buff::Calculating_coordinates(int i)
         circle(frame, calculation_position[1], 10, Scalar(0, 0, 255), -1);
         pre_center = calculation_position[1];
     }
-    else
+    else if(direction_tmp_ < 0)
     {
-        circle(frame, calculation_position[0], 10, Scalar(255, 0, 0), -1);
+        circle(frame, calculation_position[0], 10, Scalar(0, 0, 255), -1);
         pre_center = calculation_position[0];
     }
+    // else
+    // {
+    //     circle(frame, max_buff_rects[i].center, 10, Scalar(0, 0, 255), -1);
+    //     pre_center = max_buff_rects[i].center;
+    // }
     if (pre_center.x > (CAMERA_RESOLUTION_COLS / 2))
     {
         _yaw = 0;
@@ -301,6 +308,7 @@ void Max_Buff::Calculating_coordinates(int i)
     yaw = pre_center.x;
     data_type = 1;
     is_shooting = 1;
+
     // float radius = sqrt((R_center.x - max_buff_rects[i].center.x) * (R_center.x - max_buff_rects[i].center.x) + (R_center.y - max_buff_rects[i].center.y) * (R_center.y - max_buff_rects[i].center.y));
     // 计算参数方程
     // float a = (max_buff_rects[i].center.x - R_center.x) / radius;

@@ -22,12 +22,14 @@
 			"-I","/usr/local/include/",
 			"-I","/usr/local/include/opencv4/",
 			"-I","/usr/local/include/opencv4/opencv2/",
+
+	//		"-I","${workspaceFolder}/serial/serialib.hpp",
 			/* 说明整个项⽬所需的源⽂件路径(.cpp) */
 			"-g",
 			"${workspaceFolder}/armor/armorplate.cpp",
 			"${workspaceFolder}/pnp/solvepnp.cpp",
 			"${workspaceFolder}/kalmantest/kalmantest.cpp",
-			"${workspaceFolder}/serial/serialport.cpp",
+"${workspaceFolder}/serial/serialport.cpp",
 			"${workspaceFolder}/Total operation/run.cpp",
 			"${workspaceFolder}/camera/videocapture.cpp",
 			"${workspaceFolder}/detect_buff/buff_detect.cpp",

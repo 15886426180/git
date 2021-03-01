@@ -53,6 +53,7 @@ SerialPort::SerialPort()
             break;
         }
     }
+    
 
     /*设置发送波特率*/
 #if SET_BANDRATE == 115200
@@ -138,7 +139,7 @@ void SerialPort::RMreceiveData(int arr[REC_BUFF_LENGTH]){
 void SerialPort::RMserialWrite(int _yaw,int yaw,int _pitch,int pitch,int depth,int data_type = 0,int is_shooting = 0){
     sprintf(g_CRC_buf, "%c%1d%1d%1d%03d%1d%03d%04d", 'S', data_type, is_shooting, _yaw ,yaw, _pitch, pitch, depth);
     uint8_t CRC = Checksum_CRC8(g_CRC_buf, sizeof(g_CRC_buf));
-    sprintf(g_write_buf, "%c%1d%1d%1d%03d%1d%03d%04d%03d%c", 'S',data_type, is_shooting, _yaw ,yaw, _pitch, pitch, depth, CRC, 'E');
+    sprintf(g_write_buf, "%c%1d%1d%1d%04d%01d%03d%04d%03d%c", 'S',data_type, is_shooting, _yaw ,yaw, _pitch, pitch, depth, CRC, 'E');
     /*协议内容：[0]'S' 帧头
      *[1]数据是否可用(是否识别到装甲板) 
      *[2]是否可以射击(控制自动射击)
@@ -148,7 +149,8 @@ void SerialPort::RMserialWrite(int _yaw,int yaw,int _pitch,int pitch,int depth,i
      *[15]~[17]CRC CRC校验位
      *[18]'E' 帧尾
      */
-    write(fd,g_write_buf,sizeof(g_write_buf));
+    // write(fd,g_write_buf,sizeof(g_write_buf));
+    std::cout<<"g_write_buf: "<<g_write_buf<<std::endl;
     #if SHOW_SERIAL_INFORMATION == 1
     std::cout<<"g_write_buf: "<<g_write_buf<<std::endl;
     #endif

@@ -219,6 +219,8 @@ void WorKing::Run_MAX_Talisman()
         {
             capture >> frame;
         }
+        int ctrl_arr[REC_BUFF_LENGTH];
+        SerialPort::RMreceiveData(ctrl_arr);
         // resize(frame, frame, Size(640, 400));
         buff.pretreat(frame, COLOR);
         buff.Looking_for_center();
@@ -226,9 +228,15 @@ void WorKing::Run_MAX_Talisman()
 
         buff.armor_center.clear();
         buff.max_buff_rects.clear();
-        serial.RMserialWrite(buff._yaw, buff.yaw, buff._pitch, buff.pitch, buff.depth, buff.data_type, buff.is_shooting);
-        // cout << pnp.max_buff_Point(buff.max_buff_rects[buff.hit_subscript]) << endl;
 
+
+// #include "serial/serialib.hpp"
+
+//         static sl::serialib sr("/dev/tty.usbserial-0001", 921600);
+//         sr << "S111027813480000208E";
+        serial.RMserialWrite(buff._yaw, abs(buff.yaw), buff._pitch, abs(buff.pitch), buff.depth, buff.data_type, buff.is_shooting);
+        // cout << pnp.max_buff_Point(buff.max_buff_rects[buff.hit_subscript]) << endl;
+        cap.cameraReleasebuff();
 #if FPS_SHOW == 1
         t = ((double)cv::getTickCount() - t) / cv::getTickFrequency(); //结束计时
         int fps = int(1.0 / t);                                        //转换为帧率

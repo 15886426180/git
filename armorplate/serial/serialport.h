@@ -7,12 +7,12 @@
   @brief: 串口部分参数
 */
 /** Serious **/
-#define WRITE_BUFF_LENGTH 19
+#define WRITE_BUFF_LENGTH 20
 /**
   @brief: 写入串口的Buff长度
   */
 
-#define CRC_BUFF_LENGTH 15
+#define CRC_BUFF_LENGTH 16
 /**
   @brief: 进入CRC校验的Buff长度
   */
