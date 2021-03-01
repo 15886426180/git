@@ -5,7 +5,7 @@
  * @brief 弧度转角度
  * 
  */
-#define CALL_SERIALPORT 0
+#define CALL_SERIALPORT 1
 /**
  * @brief 打开串口传输
  * @param: 0   不使用
