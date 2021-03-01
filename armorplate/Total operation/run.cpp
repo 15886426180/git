@@ -226,14 +226,15 @@ void WorKing::Run_MAX_Talisman()
 
         buff.armor_center.clear();
         buff.max_buff_rects.clear();
-        cout << pnp.max_buff_Point(buff.max_buff_rects[buff.hit_subscript]) << endl;
-        
+
+        // cout << pnp.max_buff_Point(buff.max_buff_rects[buff.hit_subscript]) << endl;
+
 #if FPS_SHOW == 1
         t = ((double)cv::getTickCount() - t) / cv::getTickFrequency(); //结束计时
         int fps = int(1.0 / t);                                        //转换为帧率
         cout << "FPS: " << fps << endl;                                //输出帧率
 #endif
-        char c = waitKey(100);
+        char c = waitKey(1);
         if (c == 27) //"Esc"-退出
         {
             break;

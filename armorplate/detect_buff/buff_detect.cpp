@@ -93,7 +93,9 @@ void Max_Buff::Looking_for_center()
         {
             R_center = minRect.center;
             R_success = true;
-            circle(frame, R_center, 5, Scalar(255, 0, 0), -1);
+            RotatedRect roi_R(R_center, Size(90, 90), 0);
+            roi = roi_R.boundingRect();
+            rectangle(frame, roi, Scalar(0, 255, 255), 3, 8);
         }
     }
     for (size_t i = 0; i < contours.size(); i++)
@@ -131,11 +133,19 @@ void Max_Buff::Looking_for_center()
             num++;
         }
     }
+    ++find_cnt_;
+    if (find_cnt_ % 2 == 0)
+    {                                //隔帧读数据
+        direction_tmp_ = Getstate(); //判断旋转方向 1顺时针,-1逆时针
+        if (find_cnt_ == 10)
+            find_cnt_ = 0;
+    }
     if (R_success)
     {
         if (choice_success)
         {
             radius = sqrt((R_center.x - max_buff_rects[0].center.x) * (R_center.x - max_buff_rects[0].center.x) + (R_center.y - max_buff_rects[0].center.y) * (R_center.y - max_buff_rects[0].center.y));
+            small_radius = (sqrt(pow(max_buff_rects[hit_subscript].size.width, 2) + pow(max_buff_rects[hit_subscript].size.height, 2))) / 2;
             circle(frame, R_center, radius, Scalar(255, 255, 0), 3);
             circle(frame, max_buff_rects[hit_subscript].center, 7, Scalar(0, 0, 255), -1);
             line(frame, R_center, max_buff_rects[hit_subscript].center, Scalar(0, 0, 255), 3);
@@ -232,46 +242,111 @@ int Max_Buff::average_color(Mat roi)
  */
 void Max_Buff::Calculating_coordinates(int i)
 {
-    // float radius = sqrt((R_center.x - max_buff_rects[i].center.x) * (R_center.x - max_buff_rects[i].center.x) + (R_center.y - max_buff_rects[i].center.y) * (R_center.y - max_buff_rects[i].center.y));
-    //计算参数方程
-    float a = (max_buff_rects[i].center.x - R_center.x) / radius;
-    float b = (max_buff_rects[i].center.y - R_center.y) / radius;
-    angle_cos = acos(a) * ARC_ANGLE;
-    angle_sin = asin(b) * ARC_ANGLE;
+    float a1 = R_center.x;
+    float b1 = R_center.y;
+    float R1 = radius;
 
-    if (angle_cos > 180 || angle_cos < -180)
+    float a2 = max_buff_rects[i].center.x;
+    float b2 = max_buff_rects[i].center.y;
+    float R2 = small_radius;
+
+    float a1a1 = R_center.x * R_center.x;
+    float b1b1 = R_center.y * R_center.y;
+    float R1R1 = radius * radius;
+
+    float a2a2 = max_buff_rects[i].center.x * max_buff_rects[i].center.x;
+    float b2b2 = max_buff_rects[i].center.y * max_buff_rects[i].center.y;
+    float R2R2 = small_radius * small_radius;
+
+    float subs1 = a1a1 - 2 * a1 * a2 + a2a2 + b1b1 - 2 * b1 * b2 + b2b2;
+    float subs2 = -R1R1 * a1 + R1R1 * a2 + R2R2 * a1 - R2R2 * a2 + a1a1 * a1 - a1a1 * a2 - a1 * a2a2 + a1 * b1b1 - 2 * a1 * b1 * b2 + a1 * b2b2 + a2a2 * a2 + a2 * b1b1 - 2 * a2 * b1 * b2 + a2 * b2b2;
+    float subs3 = -R1R1 * b1 + R1R1 * b2 + R2R2 * b1 - R2R2 * b2 + a1a1 * b1 + a1a1 * b2 - 2 * a1 * a2 * b1 - 2 * a1 * a2 * b2 + a2a2 * b1 + a2a2 * b2 + b1b1 * b1 - b1b1 * b2 - b1 * b2b2 + b2b2 * b2;
+    float sigma = sqrt((R1R1 + 2 * R1 * R2 + R2R2 - a1a1 + 2 * a1 * a2 - a2a2 - b1b1 + 2 * b1 * b2 - b2b2) * (-R1R1 + 2 * R1 * R2 - R2R2 + subs1));
+
+    if (abs(subs1) > 0.0000001) //分母不为0
     {
-        angle = angle_sin + forecast_angle;
-        calculation_position = Point(R_center.x - (radius * cos((angle) / ARC_ANGLE)), R_center.y - (radius * sin((angle) / ARC_ANGLE)));
+        calculation_position[0].x = (subs2 - sigma * b1 + sigma * b2) / (2 * subs1);
+        calculation_position[1].x = (subs2 + sigma * b1 - sigma * b2) / (2 * subs1);
+
+        calculation_position[0].y = (subs3 + sigma * a1 - sigma * a2) / (2 * subs1);
+        calculation_position[1].y = (subs3 - sigma * a1 + sigma * a2) / (2 * subs1);
     }
-    else if (angle_sin > 180 || angle_sin < -180)
+    if (direction_tmp_ > 0)
     {
-        angle = angle_cos + forecast_angle;
-        calculation_position = Point(R_center.x - (radius * cos((angle) / ARC_ANGLE)), R_center.y - (radius * sin((angle) / ARC_ANGLE)));
+        circle(frame, calculation_position[1], 10, Scalar(0, 0, 255), -1);
     }
     else
     {
-        if (abs(angle_cos) == abs(angle_sin) && angle_sin < 0)
-        {
-            angle = angle_cos + forecast_angle;
-            calculation_position = Point(R_center.x + (radius * cos((angle) / ARC_ANGLE)), R_center.y - (radius * sin((angle) / ARC_ANGLE)));
-        }
-        else if (abs(angle_cos) == abs(angle_sin) && angle_sin > 0)
-        {
-            angle = angle_cos - forecast_angle;
-            calculation_position = Point(R_center.x + (radius * cos((angle) / ARC_ANGLE)), R_center.y + (radius * sin((angle) / ARC_ANGLE)));
-        }
-        else if (abs(angle_cos) > abs(angle_sin) && angle_sin < 0)
-        {
-            angle = angle_cos + forecast_angle;
-            calculation_position = Point(R_center.x + (radius * cos((angle) / ARC_ANGLE)), R_center.y - (radius * sin((angle) / ARC_ANGLE)));
-        }
-        else if (abs(angle_cos) > abs(angle_sin) && angle_sin > 0)
-        {
-            angle = angle_cos - forecast_angle;
-            calculation_position = Point(R_center.x + (radius * cos((angle) / ARC_ANGLE)), R_center.y + (radius * sin((angle) / ARC_ANGLE)));
-        }
+        circle(frame, calculation_position[0], 10, Scalar(255, 0, 0), -1);
     }
-    cout << angle << endl;
-    circle(frame, calculation_position, 10, Scalar(0, 200, 255), -1);
+
+    // float radius = sqrt((R_center.x - max_buff_rects[i].center.x) * (R_center.x - max_buff_rects[i].center.x) + (R_center.y - max_buff_rects[i].center.y) * (R_center.y - max_buff_rects[i].center.y));
+    // 计算参数方程
+    // float a = (max_buff_rects[i].center.x - R_center.x) / radius;
+    // float b = (max_buff_rects[i].center.y - R_center.y) / radius;
+    // angle_cos = acos(a) * ARC_ANGLE;
+    // angle_sin = asin(b) * ARC_ANGLE;
+    //参数方程计算固定角度
+    // if (angle_cos > 180 || angle_cos < -180)
+    // {
+    //     angle = angle_sin + forecast_angle;
+    //     calculation_position = Point(R_center.x - (radius * cos((angle) / ARC_ANGLE)), R_center.y - (radius * sin((angle) / ARC_ANGLE)));
+    // }
+    // else if (angle_sin > 180 || angle_sin < -180)
+    // {
+    //     angle = angle_cos + forecast_angle;
+    //     calculation_position = Point(R_center.x - (radius * cos((angle) / ARC_ANGLE)), R_center.y - (radius * sin((angle) / ARC_ANGLE)));
+    // }
+    // else
+    // {
+    //     if (abs(angle_cos) == abs(angle_sin) && angle_sin < 0)
+    //     {
+    //         angle = angle_cos + forecast_angle;
+    //         calculation_position = Point(R_center.x + (radius * cos((angle) / ARC_ANGLE)), R_center.y - (radius * sin((angle) / ARC_ANGLE)));
+    //     }
+    //     else if (abs(angle_cos) == abs(angle_sin) && angle_sin > 0)
+    //     {
+    //         angle = angle_cos - forecast_angle;
+    //         calculation_position = Point(R_center.x + (radius * cos((angle) / ARC_ANGLE)), R_center.y + (radius * sin((angle) / ARC_ANGLE)));
+    //     }
+    //     else if (abs(angle_cos) > abs(angle_sin) && angle_sin < 0)
+    //     {
+    //         angle = angle_cos + forecast_angle;
+    //         calculation_position = Point(R_center.x + (radius * cos((angle) / ARC_ANGLE)), R_center.y - (radius * sin((angle) / ARC_ANGLE)));
+    //     }
+    //     else if (abs(angle_cos) > abs(angle_sin) && angle_sin > 0)
+    //     {
+    //         angle = angle_cos - forecast_angle;
+    //         calculation_position = Point(R_center.x + (radius * cos((angle) / ARC_ANGLE)), R_center.y + (radius * sin((angle) / ARC_ANGLE)));
+    //     }
+    // }
+
+    // double total;
+    // double theta = atan(double(max_buff_rects[i].center.y - R_center.y) / (max_buff_rects[i].center.x - R_center.x));
+    // total = theta * CV_PI / 180;
+    // double sin_calcu = sin(total);
+    // double cos_calcu = cos(total);
+    // Point2f round_center(R_center.x + roi.tl().x, R_center.y + roi.tl().y);
+    // pre_center.x = (max_buff_rects[i].center.x - round_center.x) * cos_calcu - (max_buff_rects[i].center.y - round_center.y) * sin_calcu + round_center.x;
+    // pre_center.y = (max_buff_rects[i].center.x - round_center.x) * sin_calcu + (max_buff_rects[i].center.y - round_center.y) * cos_calcu + round_center.y;
+    // cout << pre_center << endl;
+    // circle(frame, pre_center, 10, Scalar(0, 200, 255), -1);
+}
+
+int Max_Buff::Getstate()
+{
+    diff_angle_ = buff_angle_ - last_angle;
+    last_angle = buff_angle_;
+    if (fabs(diff_angle_) < 10 && fabs(diff_angle_) > 1e-6)
+    {
+        d_angle_ = (1 - REVISE) * d_angle_ + REVISE * diff_angle_;
+        // cout<<"d_angle_="<<d_angle_<<endl;
+    }
+    //cout << "d_angle_:" << d_angle_ << endl;
+    if (d_angle_ > 1.5)
+        return 1;
+    else if (d_angle_ < -1.5)
+        return -1;
+    else
+        return 0;
 }

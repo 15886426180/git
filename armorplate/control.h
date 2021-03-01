@@ -23,7 +23,7 @@
  * @param: 1 调用
  * @param: 0 不调用
  */
-#define USB_CAPTURE_DEFULT "/home/xx/下载/视频/效果图/camera_MaxBuff12.avi"
+#define USB_CAPTURE_DEFULT "/home/xx/下载/视频/效果图/camera_Max_Buff01.avi"
 /**
   @brief: 相机的默认值
   @note: 使用普通USB相机时，Opencv的VideoCapture接口的值
@@ -74,7 +74,7 @@
  * @param 0 不显示
  */
 
-#define COLOR 0
+#define COLOR 1
 /**
  * @brief 敌方颜色
  * @param 1 红色
@@ -170,6 +170,8 @@
  * @brief 相机高度
  * 
  */
+//buff-filter(buff_detect.cpp)
+#define REVISE 0.1
 
 #define MAX_BUFF_WIDTH 300
 #define MAX_BUFF_HEIGHT 170
