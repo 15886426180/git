@@ -32,7 +32,7 @@ public:
     float d_angle_ = 1; //0
     int find_cnt_ = 0;
     int direction_tmp_ = 0;
-    float make_up_angle = 3.488372093; //计算补偿角度
+    int make_up_angle = 60; //计算补偿角度
     Mat frame;
     Mat mask;
     Mat gray_img;

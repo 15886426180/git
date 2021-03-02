@@ -229,11 +229,10 @@ void WorKing::Run_MAX_Talisman()
         buff.armor_center.clear();
         buff.max_buff_rects.clear();
 
+        // #include "serial/serialib.hpp"
 
-// #include "serial/serialib.hpp"
-
-//         static sl::serialib sr("/dev/tty.usbserial-0001", 921600);
-//         sr << "S111027813480000208E";
+        //         static sl::serialib sr("/dev/tty.usbserial-0001", 921600);
+        //         sr << "S111027813480000208E";
         serial.RMserialWrite(buff._yaw, abs(buff.yaw), buff._pitch, abs(buff.pitch), buff.depth, buff.data_type, buff.is_shooting);
         // cout << pnp.max_buff_Point(buff.max_buff_rects[buff.hit_subscript]) << endl;
         cap.cameraReleasebuff();

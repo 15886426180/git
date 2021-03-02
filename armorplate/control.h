@@ -182,7 +182,20 @@
 #define REVISE 0.1
 
 #define MAX_BUFF_WIDTH 300
+/**
+ * @brief 击打内装甲宽度
+ * 
+ */
 #define MAX_BUFF_HEIGHT 170
+/**
+ * @brief 击打内装甲高度
+ * 
+ */
+#define MAX_BUFF_RADIUS 700
+/**
+ * @brief 大神符半径（圆心到击打中心点）
+ * 
+ */
 
 #define ANTI_RANGE 1.01 //指数增长的底数
 #define ACC 0.000001f

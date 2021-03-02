@@ -258,24 +258,25 @@ void Max_Buff::Calculating_coordinates(int i)
     float a2 = max_buff_rects[i].center.x;
     float b2 = max_buff_rects[i].center.y;
     float R2;
-    if (1) //小能量机关补偿
+    if (true) //小能量机关补偿
     {
-        R2 = small_radius * make_up_angle;
+        R2 = sqrt(2 * MAX_BUFF_RADIUS * MAX_BUFF_RADIUS * (1 - cos(CV_PI * MAX_BUFF_RADIUS * make_up_angle / 180))) / 10;
     }
     else
     {
+        // R2 =
     }
 
-    float a1a1 = R_center.x * R_center.x;
-    float b1b1 = R_center.y * R_center.y;
-    float R1R1 = radius * radius;
-    float a2a2 = max_buff_rects[i].center.x * max_buff_rects[i].center.x;
-    float b2b2 = max_buff_rects[i].center.y * max_buff_rects[i].center.y;
-    float R2R2 = small_radius * small_radius;
-    float subs1 = a1a1 - 2 * a1 * a2 + a2a2 + b1b1 - 2 * b1 * b2 + b2b2;
-    float subs2 = -R1R1 * a1 + R1R1 * a2 + R2R2 * a1 - R2R2 * a2 + a1a1 * a1 - a1a1 * a2 - a1 * a2a2 + a1 * b1b1 - 2 * a1 * b1 * b2 + a1 * b2b2 + a2a2 * a2 + a2 * b1b1 - 2 * a2 * b1 * b2 + a2 * b2b2;
-    float subs3 = -R1R1 * b1 + R1R1 * b2 + R2R2 * b1 - R2R2 * b2 + a1a1 * b1 + a1a1 * b2 - 2 * a1 * a2 * b1 - 2 * a1 * a2 * b2 + a2a2 * b1 + a2a2 * b2 + b1b1 * b1 - b1b1 * b2 - b1 * b2b2 + b2b2 * b2;
-    float sigma = sqrt((R1R1 + 2 * R1 * R2 + R2R2 - a1a1 + 2 * a1 * a2 - a2a2 - b1b1 + 2 * b1 * b2 - b2b2) * (-R1R1 + 2 * R1 * R2 - R2R2 + subs1));
+    float a1_square = a1 * a1;
+    float b1_square = b1 * b1;
+    float R1_square = R1 * R1;
+    float a2_square = a2 * a2;
+    float b2_square = b2 * b2;
+    float R2_square = R2 * R2;
+    float subs1 = a1_square - 2 * a1 * a2 + a2_square + b1_square - 2 * b1 * b2 + b2_square;
+    float subs2 = -R1_square * a1 + R1_square * a2 + R2_square * a1 - R2_square * a2 + a1_square * a1 - a1_square * a2 - a1 * a2_square + a1 * b1_square - 2 * a1 * b1 * b2 + a1 * b2_square + a2_square * a2 + a2 * b1_square - 2 * a2 * b1 * b2 + a2 * b2_square;
+    float subs3 = -R1_square * b1 + R1_square * b2 + R2_square * b1 - R2_square * b2 + a1_square * b1 + a1_square * b2 - 2 * a1 * a2 * b1 - 2 * a1 * a2 * b2 + a2_square * b1 + a2_square * b2 + b1_square * b1 - b1_square * b2 - b1 * b2_square + b2_square * b2;
+    float sigma = sqrt((R1_square + 2 * R1 * R2 + R2_square - a1_square + 2 * a1 * a2 - a2_square - b1_square + 2 * b1 * b2 - b2_square) * (-R1_square + 2 * R1 * R2 - R2_square + subs1));
 
     if (abs(subs1) > 0.0000001) //分母不为0
     {
