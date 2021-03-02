@@ -26,6 +26,9 @@ public:
 
     int hit_subscript = 0;
 
+    double timing_point_1 = 0;
+    double timing_point_2 = 0;
+
     float buff_angle_ = 0;
     float diff_angle_ = 0;
     float last_angle = 0;
@@ -33,6 +36,7 @@ public:
     int find_cnt_ = 0;
     int direction_tmp_ = 0;
     int make_up_angle = 60; //计算补偿角度
+
     Mat frame;
     Mat mask;
     Mat gray_img;

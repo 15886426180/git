@@ -138,6 +138,7 @@ void Max_Buff::Looking_for_center()
     {
         if (choice_success)
         {
+            timing_point_1 = getTickCount();
             ++find_cnt_;
             if (find_cnt_ % 2 == 0)
             { //隔帧读数据
@@ -258,13 +259,16 @@ void Max_Buff::Calculating_coordinates(int i)
     float a2 = max_buff_rects[i].center.x;
     float b2 = max_buff_rects[i].center.y;
     float R2;
-    if (true) //小能量机关补偿
+    if (false) //小能量机关补偿
     {
         R2 = sqrt(2 * MAX_BUFF_RADIUS * MAX_BUFF_RADIUS * (1 - cos(CV_PI * MAX_BUFF_RADIUS * make_up_angle / 180))) / 10;
     }
     else
     {
-        // R2 =
+        double spt_t = (timing_point_1 - timing_point_2) / getTickFrequency(); //现在的单位为秒
+        timing_point_2 = getTickCount();
+        make_up_angle = 0.785 * sin(spt_t * 1.884 * CV_PI / 180) + 1.305;
+        R2 = sqrt(2 * MAX_BUFF_RADIUS * MAX_BUFF_RADIUS * (1 - cos(CV_PI * MAX_BUFF_RADIUS * make_up_angle / 180))) / 10;
     }
 
     float a1_square = a1 * a1;
