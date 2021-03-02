@@ -23,13 +23,13 @@
  * @param: 1 调用
  * @param: 0 不调用
  */
-#define USB_CAPTURE_DEFULT "/home/xx/下载/视频/效果图/camera_Max_Buff01.avi"
+#define USB_CAPTURE_DEFULT "/home/xx/下载/视频/效果图/camera_MaxBuff13.avi"
 /**
   @brief: 相机的默认值
   @note: 使用普通USB相机时，Opencv的VideoCapture接口的值
 */
 
-#define ISOPEN_INDUSTRY_CAPTURE 0
+#define ISOPEN_INDUSTRY_CAPTURE 1
 /**
   @brief: 是否使用工业相机
   @param: 0     使用工业相机

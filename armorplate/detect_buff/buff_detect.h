@@ -32,7 +32,7 @@ public:
     float d_angle_ = 1; //0
     int find_cnt_ = 0;
     int direction_tmp_ = 0;
-
+    float make_up_angle = 3.488372093; //计算补偿角度
     Mat frame;
     Mat mask;
     Mat gray_img;
@@ -48,10 +48,10 @@ public:
     bool choice_success = false;
     Point2f calculation_position[2];
     //蓝色th参数
-    int blue_armor_gray_th = 132;
-    int blue_armor_color_th = 44;
+    int blue_armor_gray_th = 110;
+    int blue_armor_color_th = 65;
     //红色th参数
-    int red_armor_gray_th = 70;
-    int red_armor_color_th = 15;
+    int red_armor_gray_th = 90;
+    int red_armor_color_th = 50;
     int _yaw, yaw, _pitch, pitch, depth = 0, data_type, is_shooting;
 };

@@ -134,18 +134,23 @@ void Max_Buff::Looking_for_center()
             num++;
         }
     }
-    ++find_cnt_;
-    if (find_cnt_ % 2 == 0)
-    {                                //隔帧读数据
-        direction_tmp_ = Getstate(); //判断旋转方向 1顺时针,-1逆时针
-        if (find_cnt_ == 10)
-            find_cnt_ = 0;
-    }
-    cout<<direction_tmp_<<endl;
     if (R_success)
     {
         if (choice_success)
         {
+            ++find_cnt_;
+            if (find_cnt_ % 2 == 0)
+            { //隔帧读数据
+                buff_angle_ = max_buff_rects[hit_subscript].angle;
+                direction_tmp_ = Getstate(); //判断旋转方向 1顺时针,-1逆时针
+                if (find_cnt_ == 10)
+                    find_cnt_ = 0;
+            }
+            else
+            {
+                diff_angle_ = max_buff_rects[hit_subscript].angle;
+            }
+            cout << direction_tmp_ << endl;
             radius = sqrt((R_center.x - max_buff_rects[0].center.x) * (R_center.x - max_buff_rects[0].center.x) + (R_center.y - max_buff_rects[0].center.y) * (R_center.y - max_buff_rects[0].center.y));
             small_radius = (sqrt(pow(max_buff_rects[hit_subscript].size.width, 2) + pow(max_buff_rects[hit_subscript].size.height, 2))) / 2;
             circle(frame, R_center, radius, Scalar(255, 255, 0), 3);
@@ -244,22 +249,29 @@ int Max_Buff::average_color(Mat roi)
  */
 void Max_Buff::Calculating_coordinates(int i)
 {
+    //计算两个圆的交叉点位置
+    //圆一
     float a1 = R_center.x;
     float b1 = R_center.y;
     float R1 = radius;
-
+    //圆二
     float a2 = max_buff_rects[i].center.x;
     float b2 = max_buff_rects[i].center.y;
-    float R2 = small_radius;
+    float R2;
+    if (1) //小能量机关补偿
+    {
+        R2 = small_radius * make_up_angle;
+    }
+    else
+    {
+    }
 
     float a1a1 = R_center.x * R_center.x;
     float b1b1 = R_center.y * R_center.y;
     float R1R1 = radius * radius;
-
     float a2a2 = max_buff_rects[i].center.x * max_buff_rects[i].center.x;
     float b2b2 = max_buff_rects[i].center.y * max_buff_rects[i].center.y;
     float R2R2 = small_radius * small_radius;
-
     float subs1 = a1a1 - 2 * a1 * a2 + a2a2 + b1b1 - 2 * b1 * b2 + b2b2;
     float subs2 = -R1R1 * a1 + R1R1 * a2 + R2R2 * a1 - R2R2 * a2 + a1a1 * a1 - a1a1 * a2 - a1 * a2a2 + a1 * b1b1 - 2 * a1 * b1 * b2 + a1 * b2b2 + a2a2 * a2 + a2 * b1b1 - 2 * a2 * b1 * b2 + a2 * b2b2;
     float subs3 = -R1R1 * b1 + R1R1 * b2 + R2R2 * b1 - R2R2 * b2 + a1a1 * b1 + a1a1 * b2 - 2 * a1 * a2 * b1 - 2 * a1 * a2 * b2 + a2a2 * b1 + a2a2 * b2 + b1b1 * b1 - b1b1 * b2 - b1 * b2b2 + b2b2 * b2;
@@ -275,19 +287,18 @@ void Max_Buff::Calculating_coordinates(int i)
     }
     if (direction_tmp_ > 0) //顺时针
     {
-        circle(frame, calculation_position[1], 10, Scalar(0, 0, 255), -1);
         pre_center = calculation_position[1];
     }
-    else if(direction_tmp_ < 0)
+    else if (direction_tmp_ < 0)
     {
-        circle(frame, calculation_position[0], 10, Scalar(0, 0, 255), -1);
         pre_center = calculation_position[0];
     }
-    // else
-    // {
-    //     circle(frame, max_buff_rects[i].center, 10, Scalar(0, 0, 255), -1);
-    //     pre_center = max_buff_rects[i].center;
-    // }
+    else
+    {
+        pre_center = max_buff_rects[i].center;
+    }
+    circle(frame, pre_center, 7, Scalar(0, 255, 255), -1);
+    line(frame, R_center, pre_center, Scalar(0, 0, 255), 3, 8);
     if (pre_center.x > (CAMERA_RESOLUTION_COLS / 2))
     {
         _yaw = 0;
