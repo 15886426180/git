@@ -111,21 +111,26 @@ int VideoCap::cameraSet()
     pImageResolution.iHeight = CAMERA_RESOLUTION_ROWS;
     pImageResolution.iHOffsetFOV = int(CAMERA_RESOLUTION_COLS_FOV);
     pImageResolution.iVOffsetFOV = int(CAMERA_RESOLUTION_ROWS_FOV);
+    CameraSetImageResolution(hCamera, &pImageResolution);
     /*--------设置分辨率---------*/
 
     /*--------设置曝光时间---------*/
     cout << CameraGetAeState(hCamera, &AEstate);
     cout << CameraSetAeState(hCamera, FALSE);
-
-    CameraSetExposureTime(hCamera, CAMERA_EXPOSURETIME);
-
+    if (ENEMY_COLOR == 0)
+    {
+        CameraSetExposureTime(hCamera, CAMERA_EXPOSURETIME);
+    }
+    else
+    {
+        CameraSetExposureTime(hCamera, CAMERA_EXPOSURETIME);
+    }
     /*--------设置曝光时间---------*/
 
     /*让SDK进入工作模式，开始接收来自相机发送的图像数据。
      *如果当前相机是触发模式，则需要接收到触发帧以后才会更新图像*/
     CameraPlay(hCamera);
     CameraReleaseImageBuffer(hCamera, pbyBuffer);
-    
     /*
     其他的相机参数设置
     例如 CameraSetExposureTime   CameraGetExposureTime  设置/读取曝光时间
@@ -133,7 +138,6 @@ int VideoCap::cameraSet()
          CameraSetGamma、CameraSetConrast、CameraSetGain等设置图像伽马、对比度、RGB数字增益等等。
          更多的参数的设置方法，，清参考MindVision_Demo。本例程只是为了演示如何将SDK中获取的图像，转成OpenCV的图像格式,以便调用OpenCV的图像处理函数进行后续开发
     */
-    CameraSetGain(hCamera, 150, 115, 84);
     if (tCapability.sIspCapacity.bMonoSensor)
     {
         channel = 1;

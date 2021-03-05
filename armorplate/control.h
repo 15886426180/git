@@ -11,6 +11,20 @@
  * @param: 0   不使用
  * @param: 1   使用
  */
+#define SERIAL_COMMUNICATION_PLAN 1
+/**
+  @brief: 串口所发送的方案
+  @param: 0         二维＋深度
+  @param: 1         云台俯仰与偏航角度
+*/
+#define SHOW_SERIAL_INFORMATION 1
+/**
+  @brief: 是否打印串口数据信息
+  @param: 0     不打印
+  @param: 1     打印
+*/
+/*---------------------------------------------------*/
+
 #define CALL_KALMAN 0
 /**
  * @brief 是否调用卡尔曼
@@ -23,7 +37,7 @@
  * @param: 1 调用
  * @param: 0 不调用
  */
-#define USB_CAPTURE_DEFULT "/home/xx/下载/视频/效果图/camera_MaxBuff13.avi"
+#define USB_CAPTURE_DEFULT "/home/xx/下载/视频/效果图/camera_Max_Buff01.avi"
 /**
   @brief: 相机的默认值
   @note: 使用普通USB相机时，Opencv的VideoCapture接口的值
@@ -46,7 +60,7 @@
  * @param 1 截取
  * @param 0 不截取 
  */
-#define FPS_SHOW 0
+#define FPS_SHOW 1
 /**
  * @brief 是否显示帧数
  * @param 1 显示
@@ -74,7 +88,7 @@
  * @param 0 不显示
  */
 
-#define COLOR 0
+#define ENEMY_COLOR 1
 /**
  * @brief 敌方颜色
  * @param 1 红色
@@ -126,15 +140,7 @@
  * @brief 灯条实际宽度(mm)
  * 
  */
-
-#define SET_BANDRATE 115200
-//#define SET_BANDRATE 1500000
-/**
-  @brief: 设置波特率
-  @param: 115200    波特率115200
-  @param: 1500000   波特率1500000
-*/
-#define CAMERA_EXPOSURETIME 2000
+#define CAMERA_EXPOSURETIME 800
 #define CAMERA_RESOLUTION_COLS 1280
 #define CAMERA_RESOLUTION_ROWS 800
 #define CAMERA_RESOLUTION_COLS_FOV ((1280 - CAMERA_RESOLUTION_COLS) * 0.5)
@@ -157,7 +163,7 @@
 #define CAMERA_PARAM_FILE "/home/xx/RoboMaster-2021-vision-code/src/cameraParams.xml"
 
 #elif ISOPEN_INDUSTRY_CAPTURE == 0
-#define CAMERA_PARAM_FILE "/home/gcurobot/armorplate/armorplate/camera.xml"
+#define CAMERA_PARAM_FILE "/home/gcurobot/xx_git/git/armorplate/camera.xml"
 #endif
 /**
  * @brief 相机标定文件位置
@@ -181,21 +187,9 @@
 //buff-filter(buff_detect.cpp)
 #define REVISE 0.1
 
-#define MAX_BUFF_WIDTH 300
-/**
- * @brief 击打内装甲宽度
- * 
- */
-#define MAX_BUFF_HEIGHT 170
-/**
- * @brief 击打内装甲高度
- * 
- */
+#define MAX_BUFF_WIDTH 230
+#define MAX_BUFF_HEIGHT 140
 #define MAX_BUFF_RADIUS 700
-/**
- * @brief 大神符半径（圆心到击打中心点）
- * 
- */
 
 #define ANTI_RANGE 1.01 //指数增长的底数
 #define ACC 0.000001f
@@ -203,6 +197,13 @@
 #define DEAD_BAND 0
 #define SIZE_X 960
 #define SIZE_Y 480
+
+//buff-model尺寸(solve_pnp.cpp)
+#define BULLET_SPEED 29             //子弹射速
+#define BUFF_BOTTOM_H -100          //buff最底装甲板距离地面高度 728.84
+#define ROBOT_H 330                 //枪口高度    现在是330~340 也有可能是摄像头高度，待测
+#define BUFF_ROBOT_Z 6915.340249311 //枪口和buff的直线距离    6915.340249311 6817.708 7212.708
+#define OFFSET_Y_BARREL_PTZ 0       //枪管和云台的高度差
 
 //启用pid修正
 #define PID
@@ -213,4 +214,6 @@
 #define KP 0.6
 #define KI 0.02
 #define KD 0.1
+
+#define PRE_ANGLE 35
 #endif

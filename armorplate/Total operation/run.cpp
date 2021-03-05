@@ -38,7 +38,7 @@ void WorKing::Run()
         }
 #endif
         //图像预处理
-        img.pretreat(src_img, COLOR);
+        img.pretreat(src_img, ENEMY_COLOR);
         //找到灯条后
 
         if (rgb.find_light(img.mask))
@@ -211,6 +211,7 @@ void WorKing::Run_MAX_Talisman()
 #if FPS_SHOW == 1
         double t = (double)cv::getTickCount(); //开始计时
 #endif                                         // #endif
+
         if (cap.isindustryimgInput())
         {
             frame = cvarrToMat(cap.iplImage, true);
@@ -219,28 +220,107 @@ void WorKing::Run_MAX_Talisman()
         {
             capture >> frame;
         }
-        int ctrl_arr[REC_BUFF_LENGTH];
-        SerialPort::RMreceiveData(ctrl_arr);
-        // resize(frame, frame, Size(640, 400));
-        buff.pretreat(frame, COLOR);
-        buff.Looking_for_center();
-        imshow("frame", frame);
 
-        buff.armor_center.clear();
-        buff.max_buff_rects.clear();
+        Mat src_img;
+        resize(frame, src_img, Size(CAMERA_RESOLUTION_COLS, CAMERA_RESOLUTION_ROWS));
+        buff.pretreat(src_img, ENEMY_COLOR);
+        if (buff.Looking_for_center())
+        {
+            int num = buff.Looking_for_target();
+            float pre_center_angle;
+            int _w = MAX(buff.max_buff_rects[buff.hit_subscript].size.width, buff.max_buff_rects[buff.hit_subscript].size.height);
+            int _h = MIN(buff.max_buff_rects[buff.hit_subscript].size.width, buff.max_buff_rects[buff.hit_subscript].size.height);
+            if (num < 6 && num > 0)
+            {
+                buff.Calculating_coordinates(buff.hit_subscript);
+                pre_center_angle = atan2(buff.central_point.y - buff.pre_center.y, buff.central_point.x - buff.pre_center.x) * 180 / CV_PI + 90;
+                buff.rects_2d = RotatedRect(buff.pre_center, Size(_w, _h), pre_center_angle);
+                Point2f vertex[4];
+                buff.rects_2d.points(vertex);
+                for (int i = 0; i < 4; i++)
+                {
+                    line(src_img, vertex[i], vertex[(i + 1) % 4], Scalar(255, 100, 200), 5, CV_AA);
+                }
+            }
+            else
+            {
+                buff.pre_center = buff.central_point;
+                buff.rects_2d = RotatedRect(buff.pre_center, Size(_w, _h), 0);
+                rectangle(buff.src_img, buff.rects_2d.boundingRect(), Scalar(0, 255, 0), 3, 8);
+                pre_center_angle = 0;
+            }
+            pnp.vertex_Sort(buff.rects_2d);
+            pnp.run_SolvePnp_Buff(src_img, pre_center_angle, MAX_BUFF_WIDTH, MAX_BUFF_HEIGHT);
+            buff.yaw_data = pnp.angle_x;
+            // buff.yaw_data = yaw_test;
+            buff.pitch_data = pnp.angle_y;
 
-        // #include "serial/serialib.hpp"
+            //test 半径补偿
+            if (buff.yaw_data < 0)
+            {
+                buff.yaw_data += buff.offset_ratio / 10;
+            }
+            else
+            {
+                buff.yaw_data -= buff.offset_ratio / 10;
+            }
 
-        //         static sl::serialib sr("/dev/tty.usbserial-0001", 921600);
-        //         sr << "S111027813480000208E";
-        serial.RMserialWrite(buff._yaw, abs(buff.yaw), buff._pitch, abs(buff.pitch), buff.depth, buff.data_type, buff.is_shooting);
-        // cout << pnp.max_buff_Point(buff.max_buff_rects[buff.hit_subscript]) << endl;
-        cap.cameraReleasebuff();
+            if (buff.pitch_data > 0)
+            {
+                buff.pitch_data += buff.offset_ratio / 10;
+            }
+            else
+            {
+                buff.pitch_data -= buff.offset_ratio / 10;
+            }
+            //test 半径补偿
+
+            buff.depth = int(pnp.dist);
+
+            if (buff._offset_x == 0)
+            {
+                buff.yaw_data = buff.yaw_data - buff.offset_x / 100;
+            }
+            else
+            {
+                buff.yaw_data = buff.yaw_data + buff.offset_x / 100;
+            }
+
+            if (buff._offset_y == 0)
+            {
+                buff.pitch_data = buff.pitch_data - buff.offset_y / 100;
+            }
+            else
+            {
+                buff.pitch_data = buff.pitch_data + buff.offset_y / 100;
+            }
+        }
+        else
+        {
+            buff.yaw_data = 0;
+            buff.pitch_data = 0;
+            buff.yaw_data = 0;
+            buff.pitch_data = 0;
+        }
+        serial.RMserialWrite(buff._yaw_data, fabs(buff.yaw_data) * 100, buff._pitch_data, fabs(buff.pitch_data) * 100, buff.depth, buff.choice_success, buff.diff_angle_);
+        line(buff.src_img, Point(640, 0), Point(640, 800), Scalar(0, 255, 255), 3, 5);
+        line(buff.src_img, Point(0, 400), Point(1280, 400), Scalar(0, 255, 255), 3, 5);
+        imshow("frame", buff.src_img);
 #if FPS_SHOW == 1
         t = ((double)cv::getTickCount() - t) / cv::getTickFrequency(); //结束计时
         int fps = int(1.0 / t);                                        //转换为帧率
         cout << "FPS: " << fps << endl;                                //输出帧率
 #endif
+
+        buff.choice_success = false;
+        buff.central_success = false;
+        buff.armor_center.clear();
+        buff.max_buff_rects.clear();
+        buff.contours.clear();
+        buff.hierarchy.clear();
+        buff.buff.clear();
+
+        cap.cameraReleasebuff();
         char c = waitKey(1);
         if (c == 27) //"Esc"-退出
         {

@@ -5,8 +5,7 @@
 int main()
 {
     WorKing run;
-    // run.Run();
-    // run.ddd();
+
     run.Run_MAX_Talisman();
     return 0;
 }

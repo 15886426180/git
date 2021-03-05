@@ -22,7 +22,13 @@ public:
     float run_SolvePnp(float _W, float _H);
     float get_angle();
     float calcu_depth();
-    float max_buff_Point(RotatedRect rects);
+    void vertex_Sort(RotatedRect &box);
+    //大神符
+    void run_SolvePnp_Buff(Mat &srcImg, float buff_angle, float _W, float _H);
+    void draw_Coordinate(Mat &input);
+    // void get_Angel_Buff(const Mat &pos_in_ptz, float buff_angle);
+    void get_Angel_Buff(const Mat &pos_in_ptz, float buff_angle);
+    float getBuffPitch(float dist, float tvec_y, float ballet_speed);
     //小孔成像
     float Pinhole_imaging(RotatedRect rects, float _h);
     Mat camera_ptz(Mat &t);
@@ -35,7 +41,7 @@ public:
     Mat rvec_invert = Mat::zeros(3, 3, CV_64FC1);
     Mat world_point = Mat::zeros(3, 1, CV_8UC1);
     vector<Point3f> object_3d;
-    int dist = 0;
+    float angle_x, angle_y, dist;
     int theta_x;
     int theta_y;
     int theta_z;
